@@ -1,0 +1,1799 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Win | Administración</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mux/mux-player"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght=700&family=Poppins:wght=400;600;700&display=swap');
+        .font-oriental { font-family: 'Cinzel', serif; }
+        .font-sans { font-family: 'Poppins', sans-serif; }
+        
+        /* INTEGRACIÓN DEL WALLPAPER CON OVERLAY */
+        .brawl-bg { 
+            background: linear-gradient(to bottom, rgba(15,15,15,0.92), rgba(40,10,10,0.95)), 
+                        url('fondo-brawl.png') no-repeat center center fixed; 
+            background-size: cover;
+        }
+
+        /* 🎬 ANIMACIONES PERSONALIZADAS */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); filter: blur(4px); }
+            to { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
+        @keyframes pulseBorder {
+            0%, 100% { border-color: rgba(220, 38, 38, 1); box-shadow: 0 0 10px rgba(220, 38, 38, 0.2); }
+            50% { border-color: rgba(239, 68, 68, 0.6); box-shadow: 0 0 20px rgba(239, 68, 68, 0.5); }
+        }
+
+        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        .animate-slide-up { animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .pulse-card-border { animation: pulseBorder 3s infinite ease-in-out; }
+        body[data-theme] { --theme-accent: #dc2626; }
+        body[data-theme] [class~="bg-red-600"], body[data-theme] [class~="hover:bg-red-700"]:hover { background-color: var(--theme-accent) !important; }
+        body[data-theme] [class~="text-red-400"], body[data-theme] [class~="text-red-500"], body[data-theme] [class~="text-amber-500"] { color: var(--theme-accent) !important; }
+        body[data-theme] [class~="border-red-600"], body[data-theme] [class~="hover:border-red-600"]:hover { border-color: var(--theme-accent) !important; }
+        body[data-theme="ocean"] { --theme-accent: #0891b2; }
+        body[data-theme="forest"] { --theme-accent: #16a34a; }
+        body[data-theme="violet"] { --theme-accent: #9333ea; }
+        body[data-theme="rose"] { --theme-accent: #e11d48; }
+        body[data-theme="gold"] { --theme-accent: #d97706; }
+        body[data-theme="cyber"] { --theme-accent: #06b6d4; }
+        body[data-theme="arctic"] { --theme-accent: #38bdf8; }
+        body[data-theme="sunset"] { --theme-accent: #f97316; }
+        body[data-theme="mono"] { --theme-accent: #a1a1aa; filter: saturate(.25); }
+        body[data-theme] [class~="bg-red-600"], body[data-theme] [class~="hover:bg-red-700"]:hover { background-color: var(--custom-accent, var(--theme-accent)) !important; }
+        body[data-theme] [class~="text-red-400"], body[data-theme] [class~="text-red-500"], body[data-theme] [class~="text-amber-500"] { color: var(--custom-accent, var(--theme-accent)) !important; }
+        body[data-theme] [class~="border-red-600"], body[data-theme] [class~="hover:border-red-600"]:hover { border-color: var(--custom-accent, var(--theme-accent)) !important; }
+        body[data-theme="cyber"] { background-image: radial-gradient(ellipse at 10% 0%, rgba(6,182,212,.2), transparent 40%), linear-gradient(135deg,#020617,#0f172a 55%,#111827); }
+        body[data-theme="arctic"] { background-image: radial-gradient(ellipse at 85% 0%, rgba(56,189,248,.2), transparent 40%), linear-gradient(135deg,#020617,#0c1a2a 55%,#172554); }
+        body[data-theme="sunset"] { background-image: radial-gradient(ellipse at 80% 0%, rgba(249,115,22,.2), transparent 40%), linear-gradient(135deg,#1c0a0a,#431407 55%,#1c1917); }
+
+        /* Transiciones globales suaves */
+        input, select, textarea, button, tr, .team-card {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .admin-nav-btn[aria-current="page"] { background: var(--custom-accent, #dc2626); color: #fff; }
+        .admin-view.hidden { display: none !important; }
+
+        /* 🖨️ ESTILOS DE IMPRESIÓN PROFESIONAL */
+        @media print {
+            body { background: white !important; color: black !important; font-family: sans-serif !important; }
+            .no-print, head, script, nav, header, form, button, select, section:not(#area-impresion-exclusiva) { display: none !important; }
+            #area-impresion-exclusiva { display: block !important; width: 100% !important; margin: 0 !important; padding: 20px !important; color: black !important; }
+            .print-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+            .print-table th, .print-table td { border: 1px solid #000 !important; padding: 8px !important; text-align: left; color: black !important; }
+            .print-table th { background-color: #f2f2f2 !important; }
+            .print-bracket { border: 2px dashed #333; padding: 12px; margin-bottom: 10px; page-break-inside: avoid; background: #fafafa; }
+        }
+    </style>
+</head>
+<body class="brawl-bg text-stone-100 font-sans min-h-screen selection:bg-red-600">
+
+    <div id="area-impresion-exclusiva" class="hidden"></div>
+
+    <section id="seccion-login" class="max-w-md mx-auto pt-24 px-4 no-print animate-fade-in">
+        <div class="bg-stone-900/90 p-8 rounded-lg border-2 pulse-card-border text-center space-y-4 backdrop-blur-sm">
+            <h1 class="text-2xl font-bold font-oriental tracking-widest text-white">⚜️ CYBER WIN ⚜️</h1>
+            <p class="text-xs text-stone-400">Inicia sesión con una cuenta autorizada de Cyber Win.</p>
+            <div class="flex justify-center items-center gap-2">
+                <label for="selector-tema-admin-login" class="text-[10px] text-stone-400">Tema</label>
+                <select id="selector-tema-admin-login" onchange="cambiarTema(this.value)" class="bg-black border border-stone-800 text-stone-300 rounded p-1 text-[10px]" aria-label="Tema visual">
+                    <option value="red">Rojo neón</option><option value="ocean">Océano</option><option value="forest">Bosque</option><option value="violet">Violeta</option><option value="rose">Rosa</option><option value="gold">Oro</option><option value="cyber">Cyber</option><option value="arctic">Ártico</option><option value="sunset">Atardecer</option><option value="mono">Monocromo</option>
+                </select>
+                <button type="button" onclick="aplicarTemaAleatorio()" class="bg-stone-800 text-stone-300 rounded px-2 py-1 text-[10px]">🎲 Aleatorio</button>
+            </div>
+            <form id="admin-login-form" class="space-y-3">
+                <input type="email" id="admin-email" required autocomplete="username" placeholder="Correo de administrador" class="w-full p-2.5 bg-black border border-stone-800 text-white rounded text-center text-sm focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600">
+                <input type="password" id="admin-password" required autocomplete="current-password" placeholder="Contraseña" class="w-full p-2.5 bg-black border border-stone-800 text-white rounded text-center text-sm focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600">
+                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded text-xs uppercase tracking-wider active:scale-[0.98] shadow-lg shadow-red-900/20">Iniciar sesión</button>
+                <p id="admin-auth-message" role="status" aria-live="polite" class="text-[11px] min-h-4"></p>
+            </form>
+        </div>
+    </section>
+
+    <main id="panel-principal-admin" class="hidden container mx-auto p-4 md:p-8 max-w-5xl space-y-8 no-print animate-slide-up">
+        
+        <header class="flex flex-col md:flex-row justify-between items-center bg-stone-900/90 p-4 rounded-lg border-b-4 border-red-600 gap-4 backdrop-blur-sm shadow-xl">
+            <div>
+                <h2 class="text-xl font-bold font-oriental text-white">⚙️ CYBER WIN | ADMINISTRACIÓN</h2>
+                <p class="text-[10px] text-amber-500 font-mono">Modo: Organizador Autorizado Certificado</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <label for="selector-tema-admin" class="sr-only">Tema de Cyber Win</label>
+                <select id="selector-tema-admin" onchange="cambiarTema(this.value)" class="bg-black border border-stone-800 text-stone-300 rounded p-1.5 text-[10px]" aria-label="Tema visual">
+                    <option value="red">Rojo neón</option><option value="ocean">Océano</option><option value="forest">Bosque</option><option value="violet">Violeta</option><option value="rose">Rosa</option><option value="gold">Oro</option><option value="cyber">Cyber</option><option value="arctic">Ártico</option><option value="sunset">Atardecer</option><option value="mono">Monocromo</option>
+                </select>
+                <button type="button" onclick="aplicarTemaAleatorio()" class="bg-stone-800 text-stone-300 rounded px-2 py-1 text-[10px]">🎲 Aleatorio</button>
+                <button onclick="cerrarSesionAdmin()" class="bg-stone-800 hover:bg-red-950 hover:text-red-400 text-stone-400 text-xs px-3 py-1.5 rounded border border-stone-700 hover:border-red-900 active:scale-95">Desconectarse</button>
+            </div>
+        </header>
+
+        <div class="grid lg:grid-cols-[220px_minmax(0,1fr)] gap-5 items-start">
+        <nav class="lg:sticky lg:top-5 flex lg:flex-col gap-1 overflow-x-auto bg-stone-900/90 p-2 rounded-xl border border-stone-800" aria-label="Navegación administrativa">
+            <button type="button" data-admin-view="admin-configuracion" aria-current="page" onclick="mostrarVistaAdmin(this.dataset.adminView)" class="admin-nav-btn flex-none lg:w-full text-left px-3 py-2.5 rounded-lg text-[10px] font-bold uppercase whitespace-nowrap">⚙️ Configuración</button>
+            <button type="button" data-admin-view="admin-torneos" onclick="mostrarVistaAdmin(this.dataset.adminView)" class="admin-nav-btn flex-none lg:w-full text-left px-3 py-2.5 rounded-lg text-[10px] font-bold uppercase whitespace-nowrap">🏆 Crear torneo</button>
+            <button type="button" data-admin-view="admin-creadores" onclick="mostrarVistaAdmin(this.dataset.adminView)" class="admin-nav-btn flex-none lg:w-full text-left px-3 py-2.5 rounded-lg text-[10px] font-bold uppercase whitespace-nowrap">🎥 Creadores y lives</button>
+            <button type="button" data-admin-view="admin-stream-assets" onclick="mostrarVistaAdmin(this.dataset.adminView)" class="admin-nav-btn flex-none lg:w-full text-left px-3 py-2.5 rounded-lg text-[10px] font-bold uppercase whitespace-nowrap">📼 Grabaciones</button>
+            <button type="button" data-admin-view="admin-usuarios" onclick="mostrarVistaAdmin(this.dataset.adminView)" class="admin-nav-btn flex-none lg:w-full text-left px-3 py-2.5 rounded-lg text-[10px] font-bold uppercase whitespace-nowrap">👥 Usuarios y servidor</button>
+            <button type="button" data-admin-view="admin-eventos" onclick="mostrarVistaAdmin(this.dataset.adminView)" class="admin-nav-btn flex-none lg:w-full text-left px-3 py-2.5 rounded-lg text-[10px] font-bold uppercase whitespace-nowrap">📋 Eventos</button>
+            <button type="button" data-admin-view="admin-propuestas" onclick="mostrarVistaAdmin(this.dataset.adminView)" class="admin-nav-btn flex-none lg:w-full text-left px-3 py-2.5 rounded-lg text-[10px] font-bold uppercase whitespace-nowrap">💡 Propuestas</button>
+            <button type="button" data-admin-view="admin-avisos" onclick="mostrarVistaAdmin(this.dataset.adminView)" class="admin-nav-btn flex-none lg:w-full text-left px-3 py-2.5 rounded-lg text-[10px] font-bold uppercase whitespace-nowrap">📢 Avisos y tickets</button>
+        </nav>
+        <div class="min-w-0 space-y-4">
+
+        <section id="admin-configuracion" class="admin-view bg-stone-900/95 p-5 rounded-lg border border-stone-800 space-y-4 text-xs shadow-md">
+            <div class="space-y-4">
+                <h3 class="font-oriental font-bold text-red-500 text-sm tracking-wider border-b border-stone-800 pb-1">⚙️ CONFIG GLOBAL</h3>
+                
+                <form onsubmit="guardarAnuncioPublicitario(event)" class="space-y-3">
+                    <div>
+                        <label class="block text-stone-400 uppercase font-bold mb-1 text-[10px]">Barra de Publicidad / Noticia (Soporta saltos de línea)</label>
+                        <textarea id="input-publicidad" rows="3" required class="w-full p-2 bg-black rounded border border-stone-800 text-white focus:outline-none focus:border-red-600 resize-none font-mono focus:ring-1 focus:ring-red-600"></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-stone-100 text-black font-bold py-1.5 rounded uppercase tracking-wider text-[10px] hover:bg-amber-400 hover:text-black active:scale-95">Establecer Anuncio</button>
+                </form>
+
+                <form onsubmit="guardarDiscordOficial(event)" class="space-y-3 pt-2 border-t border-stone-800">
+                    <div>
+                        <label class="block text-stone-400 uppercase font-bold mb-1 text-[10px]">Enlace de Discord de la Comunidad</label>
+                        <input type="url" id="input-discord" required placeholder="https://discord.gg/..." class="w-full p-2 bg-black rounded border border-stone-800 text-white focus:outline-none focus:border-red-600 font-mono focus:ring-1 focus:ring-red-600">
+                    </div>
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1.5 rounded uppercase tracking-wider text-[10px] active:scale-95 shadow-md shadow-indigo-900/30">Vincular Servidor</button>
+                </form>
+            </div>
+
+        </section>
+        <section id="admin-torneos" class="admin-view hidden bg-stone-900/95 p-5 rounded-lg border border-stone-800 space-y-4 text-xs shadow-md">
+                <h3 class="font-oriental font-bold text-red-500 text-sm tracking-wider border-b border-stone-800 pb-1">➕ REGISTRAR NUEVO EVENTO COMPETITIVO</h3>
+                
+                <form onsubmit="crearNuevoEvento(event)" class="grid grid-cols-2 gap-3">
+                    <div class="col-span-2 sm:col-span-1">
+                        <label class="block text-stone-400 font-bold mb-1 text-[10px] uppercase">Nombre del Torneo / Liga *</label>
+                        <input type="text" id="ev-nombre" required placeholder="Ej: Torneo Relámpago Cyber Win" class="w-full p-2 bg-black border border-stone-800 text-white rounded focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600">
+                    </div>
+                    <div class="col-span-2 sm:col-span-1">
+                        <label class="block text-stone-400 font-bold mb-1 text-[10px] uppercase">Tipo de Evento *</label>
+                        <select id="ev-tipo" class="w-full p-2 bg-black border border-stone-800 text-stone-300 rounded focus:outline-none focus:border-red-600">
+                            <option value="Liga 3v3 (Clasificación)">Liga 3v3 (Clasificación)</option>
+                            <option value="Copa 3v3 (Eliminación Directa)">Copa 3v3 (Eliminación Directa)</option>
+                            <option value="Torneo 1v1 Showdown (Brackets)">Torneo 1v1 Showdown (Brackets)</option>
+                        </select>
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-stone-400 font-bold mb-1 text-[10px] uppercase">Banner / Imagen del Torneo (Subir desde PC, Máx 500KB)</label>
+                        <input type="file" id="ev-banner-file" accept="image/*" class="w-full p-1.5 bg-black border border-stone-800 text-stone-400 rounded focus:outline-none focus:border-red-600 text-xs file:bg-stone-800 file:border-0 file:text-stone-300 file:px-2 file:py-0.5 file:rounded file:mr-2 file:hover:bg-stone-750 cursor-pointer">
+                    </div>
+                    <div>
+                        <label class="block text-stone-400 font-bold mb-1 text-[10px] uppercase">Fecha de Inicio *</label>
+                        <input type="date" id="ev-fecha" required class="w-full p-2 bg-black border border-stone-800 text-white rounded focus:outline-none focus:border-red-600">
+                    </div>
+                    <div>
+                        <label class="block text-stone-400 font-bold mb-1 text-[10px] uppercase">Hora de Matches *</label>
+                        <input type="time" id="ev-hora" required class="w-full p-2 bg-black border border-stone-800 text-white rounded focus:outline-none focus:border-red-600">
+                    </div>
+                    <div>
+                        <label class="block text-stone-400 font-bold mb-1 text-[10px] uppercase">Límite de Clanes/Equipos *</label>
+                        <input type="number" id="ev-limite" required min="2" max="128" placeholder="Ej: 16" class="w-full p-2 bg-black border border-stone-800 text-white rounded focus:outline-none focus:border-red-600">
+                    </div>
+                    <div>
+                        <label class="block text-stone-400 font-bold mb-1 text-[10px] uppercase">Contacto / Referí Resp. *</label>
+                        <input type="text" id="ev-contacto" required placeholder="WhatsApp o Nick Admin" class="w-full p-2 bg-black border border-stone-800 text-white rounded focus:outline-none focus:border-red-600">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-stone-400 font-bold mb-1 text-[10px] uppercase">Bolsa de Premios / Rewards *</label>
+                        <textarea id="ev-premios" rows="2" required placeholder="Ej:\n🥇 1,500 Córdobas + Rol en Discord" class="w-full p-2 bg-black border border-stone-800 text-white rounded focus:outline-none focus:border-red-600 resize-none font-mono"></textarea>
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-stone-400 font-bold mb-1 text-[10px] uppercase">Reglamento y Directrices de la Sala *</label>
+                        <textarea id="ev-reglas" rows="3" required placeholder="Reglas de bindeo, penalizaciones por tardanza..." class="w-full p-2 bg-black border border-stone-800 text-white rounded focus:outline-none focus:border-red-600 resize-none font-mono"></textarea>
+                    </div>
+                    <button type="submit" class="col-span-2 bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded text-xs uppercase tracking-wider active:scale-[0.99] transition mt-1 shadow-md shadow-red-950/50">Fundar y Publicar Evento</button>
+                </form>
+        </section>
+
+        <section id="admin-creadores" class="admin-view hidden bg-stone-900/95 p-5 rounded-lg border border-red-500/40 space-y-4 shadow-md">
+            <h3 class="font-oriental font-bold text-red-500 text-sm tracking-wider border-b border-stone-800 pb-1">📱 GESTIÓN DE CREADORES AFILIADOS (TIKTOK)</h3>
+            
+            <div class="grid md:grid-cols-3 gap-4 text-xs">
+                <form onsubmit="agregarCreadorManual(event)" class="md:col-span-1 bg-black/40 p-3 rounded border border-stone-800 space-y-2.5">
+                    <span class="font-bold text-stone-300 block uppercase text-[10px] tracking-wider text-amber-500">➕ Agregar por Admin</span>
+                    <div>
+                        <label class="block text-stone-400 text-[9px] uppercase font-bold mb-0.5">Usuario de TikTok (Sin @)</label>
+                        <input type="text" id="tk-user" required placeholder="ej: cyberwin_creator" class="w-full p-2 bg-black border border-stone-850 text-white rounded text-xs focus:outline-none focus:border-red-600">
+                    </div>
+                    <div>
+                        <label class="block text-stone-400 text-[9px] uppercase font-bold mb-0.5">Nombre / Apodo en Comunidad</label>
+                        <input type="text" id="tk-nombre" required placeholder="Ej: Carlos Pro" class="w-full p-2 bg-black border border-stone-850 text-white rounded text-xs focus:outline-none focus:border-red-600">
+                    </div>
+                    <div>
+                        <label class="block text-stone-400 text-[9px] uppercase font-bold mb-0.5">Enlace de live / streaming (opcional)</label>
+                        <input type="url" id="tk-live-url" placeholder="https://..." class="w-full p-2 bg-black border border-stone-850 text-white rounded text-xs focus:outline-none focus:border-red-600">
+                    </div>
+                    <label class="flex items-center gap-2 text-[10px] text-stone-300">
+                        <input type="checkbox" id="tk-is-live" class="accent-red-600">
+                        Marcar como EN VIVO
+                    </label>
+                    <div>
+                        <label class="block text-stone-400 text-[9px] uppercase font-bold mb-0.5">Categoría / Rango</label>
+                        <select id="tk-rango" class="w-full p-2 bg-black border border-stone-850 text-stone-300 rounded text-xs focus:outline-none focus:border-red-600">
+                            <option value="Creador Oficial">Creador Oficial</option>
+                            <option value="Colaborador">Colaborador</option>
+                            <option value="Promesa">Promesa</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-1.5 rounded uppercase text-[10px] tracking-wider active:scale-95 transition">Vincular Directo</button>
+                </form>
+
+                <div class="md:col-span-2 space-y-3">
+                    <span class="font-bold text-stone-300 block uppercase text-[10px] tracking-wider text-amber-500">📥 Postulaciones en Espera y Elenco Activo</span>
+                    
+                    <div id="contenedor-solicitudes-tiktok" class="space-y-2 max-h-[280px] overflow-y-auto pr-1">
+                        </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="admin-usuarios" class="admin-view hidden bg-stone-900/95 p-5 rounded-lg border border-stone-800 space-y-4 shadow-md">
+            <h3 class="font-oriental font-bold text-white text-sm tracking-wider border-b border-stone-800 pb-1">👥 PRESENCIA DE CUENTAS Y SERVIDOR</h3>
+            <p class="text-[10px] text-stone-500">El estado en línea se basa en actividad autenticada durante los últimos 90 segundos; no representa conexiones anónimas. La lista muestra las 500 cuentas con actividad más reciente.</p>
+            <div id="server-monitor-cards" class="grid sm:grid-cols-2 xl:grid-cols-3 gap-2 text-[11px]" aria-live="polite"></div>
+            <div id="presence-summary" class="flex flex-wrap gap-3 text-xs"></div>
+            <div id="contenedor-usuarios-reales" class="grid sm:grid-cols-2 xl:grid-cols-3 gap-3 text-xs"></div>
+            <div class="border-t border-stone-800 pt-4">
+                <h3 class="font-oriental font-bold text-emerald-400 text-sm tracking-wider">💻 INFORMACIÓN DE ESTE NAVEGADOR</h3>
+                <p class="text-[10px] text-stone-500 mb-3">Estos datos son del dispositivo que está usando el administrador, no del servidor.</p>
+                <div id="estado-dispositivo" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-2 text-[11px]" aria-live="polite"></div>
+            </div>
+        </section>
+
+        <section id="admin-stream-assets" class="admin-view hidden bg-stone-900/95 p-5 rounded-lg border border-stone-800 space-y-4 shadow-md">
+            <div>
+                <h3 class="font-oriental font-bold text-white text-sm tracking-wider">📼 GRABACIONES ALMACENADAS EN MUX</h3>
+                <p class="text-[10px] text-stone-400">Eliminar una grabación también la borra del almacenamiento de Mux y no se puede deshacer.</p>
+            </div>
+            <div id="admin-stream-recordings" class="grid md:grid-cols-2 gap-4"></div>
+        </section>
+
+        <section id="admin-eventos" class="admin-view hidden bg-stone-900/95 p-5 rounded-lg border border-stone-800 space-y-4 shadow-md">
+            <h3 class="font-oriental font-bold text-red-500 text-sm tracking-wider border-b border-stone-800 pb-1">📝 CONTROL DE LOGÍSTICA DE EVENTOS PUBLICADOS</h3>
+            <div id="contenedor-eventos-admin" class="space-y-6"></div>
+        </section>
+
+        <section id="admin-propuestas" class="admin-view hidden bg-stone-900/95 p-5 rounded-lg border border-amber-500/40 space-y-4 shadow-md">
+            <h3 class="font-oriental font-bold text-amber-500 text-sm tracking-wider border-b border-stone-800 pb-1">⚖️ PANEL DE APROBACIÓN DE TORNEOS (PROPUESTAS DE COMUNIDAD)</h3>
+            <div id="contenedor-propuestas-torneos" class="space-y-4 text-xs"></div>
+        </section>
+
+        <section id="admin-avisos" class="admin-view hidden bg-stone-950/90 p-5 rounded-lg border border-amber-500/30 space-y-4 shadow-md">
+            <div class="bg-stone-900/95 p-4 rounded border border-stone-800 space-y-3">
+                <div>
+                    <h3 class="font-oriental font-bold text-amber-500 text-sm tracking-wider">📢 PUBLICAR AVISO PARA USUARIOS</h3>
+                    <p class="text-[10px] text-stone-500">Los avisos se guardan en PostgreSQL y se muestran a todos los usuarios.</p>
+                </div>
+                <form onsubmit="publicarAviso(event)" class="grid md:grid-cols-3 gap-2">
+                    <input id="aviso-titulo" required maxlength="80" placeholder="Título del aviso" class="bg-black border border-stone-800 rounded p-2 text-white text-xs">
+                    <textarea id="aviso-mensaje" required maxlength="500" rows="2" placeholder="Mensaje para la comunidad" class="bg-black border border-stone-800 rounded p-2 text-white text-xs"></textarea>
+                    <button type="submit" class="bg-amber-600 hover:bg-amber-500 text-black font-bold rounded p-2 text-xs">Publicar aviso</button>
+                </form>
+                <div id="lista-avisos-admin" class="space-y-2"></div>
+            </div>
+            <div class="flex justify-between items-center border-b border-stone-900 pb-1">
+                <div>
+                    <h3 class="font-oriental font-bold text-amber-500 text-sm tracking-wider">🗃️ BUZÓN DE INCIDENCIAS DE LA COMUNIDAD (TICKETS)</h3>
+                    <p class="text-[10px] text-stone-500">Errores visuales de la web y disputas de emparejamiento reportadas por los brawlers.</p>
+                </div>
+                <button onclick="limpiarTodosLosTickets()" class="bg-stone-900 hover:bg-red-950 text-red-400 border border-red-900/60 px-3 py-1 rounded text-[10px] font-bold active:scale-95">Limpiar Historial</button>
+            </div>
+            
+            <div class="overflow-x-auto text-xs">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-black text-stone-400 font-bold uppercase text-[10px]">
+                        <tr>
+                            <th class="p-2.5 w-24">ID Ticket</th>
+                            <th class="p-2.5 w-32">Origen</th>
+                            <th class="p-2.5">Detalles del Reporte</th>
+                            <th class="p-2.5 w-40">Contacto de Alerta</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-bugs-cuerpo" class="divide-y divide-stone-900 bg-black/20 font-mono text-[11px]"></tbody>
+                </table>
+            </div>
+        </section>
+
+        </div>
+        </div>
+    </main>
+
+    <script>
+        /**
+         * @typedef {'red'|'ocean'|'forest'|'violet'|'rose'|'gold'|'cyber'|'arctic'|'sunset'|'mono'} TemaCyberWin
+         * @typedef {{id: number, titulo: string, mensaje: string, fecha: string, activo: boolean}} AvisoCyberWin
+         */
+        let listaEventos = JSON.parse(localStorage.getItem('liga_bs_eventos')) || [];
+        let listaBugs = JSON.parse(localStorage.getItem('liga_bs_bugs')) || [];
+        let listaPropuestas = JSON.parse(localStorage.getItem('liga_bs_propuestas_torneos')) || [];
+        let listaAfiliadosTikTok = JSON.parse(localStorage.getItem('liga_bs_afiliados_tiktok')) || [];
+        let configuracionPublica = {};
+        let migracionEstadoLocalCompletada = false;
+        const colasGuardadoEstado = new Map();
+        /** @type {TemaCyberWin[]} */
+        const temasDisponibles = ['red', 'ocean', 'forest', 'violet', 'rose', 'gold', 'cyber', 'arctic', 'sunset', 'mono'];
+        let intervaloEstadoDispositivo;
+        let intervaloEstadoCompartido;
+        const TAMANO_MAXIMO_IMAGEN = 500 * 1024;
+
+        function sanitizarHTML(cadena) {
+            if (!cadena) return '';
+            return cadena.toString()
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function renderizarEditorColaborador(creator, users, container) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'bg-black/30 rounded-lg border border-stone-800 p-3 space-y-3';
+            const form = document.createElement('form');
+            form.className = 'grid sm:grid-cols-2 gap-2 text-[10px]';
+            form.addEventListener('submit', event => guardarPerfilColaborador(event, creator.id));
+            const biography = document.createElement('textarea');
+            biography.dataset.field = 'bio';
+            biography.maxLength = 500;
+            biography.rows = 2;
+            biography.placeholder = 'Biografía breve';
+            biography.value = creator.bio || '';
+            biography.className = 'sm:col-span-2 bg-black border border-stone-700 rounded p-2 text-white';
+            form.appendChild(biography);
+            const featuredLabel = document.createElement('label');
+            featuredLabel.className = 'flex items-center gap-2 text-stone-300';
+            const featured = document.createElement('input');
+            featured.type = 'checkbox';
+            featured.dataset.field = 'featured';
+            featured.checked = creator.featured === true;
+            featuredLabel.append(featured, document.createTextNode('Mostrar en colaboradores destacados'));
+            const ownerLabel = document.createElement('label');
+            ownerLabel.className = 'text-stone-400';
+            ownerLabel.textContent = 'Cuenta creadora';
+            const owner = document.createElement('select');
+            owner.dataset.field = 'userId';
+            owner.className = 'mt-1 w-full bg-black border border-stone-700 rounded p-1.5 text-white';
+            const unassigned = document.createElement('option');
+            unassigned.value = '';
+            unassigned.textContent = 'Sin vincular';
+            owner.appendChild(unassigned);
+            users.forEach(user => {
+                const option = document.createElement('option');
+                option.value = user.id;
+                option.textContent = `${user.nickname || 'Perfil sin completar'} · ${user.email}`;
+                option.selected = user.id === creator.firebase_uid;
+                owner.appendChild(option);
+            });
+            ownerLabel.appendChild(owner);
+            form.append(featuredLabel, ownerLabel);
+            const networks = creator.social_links || {};
+            ['instagram', 'tiktok', 'youtube', 'twitch', 'discord', 'x'].forEach(network => {
+                const label = document.createElement('label');
+                label.className = 'text-stone-400 capitalize';
+                label.textContent = network === 'x' ? 'X' : network;
+                const input = document.createElement('input');
+                input.type = 'url';
+                input.dataset.network = network;
+                input.value = networks[network] || '';
+                input.placeholder = `https://${network}.com/...`;
+                input.className = 'mt-1 w-full bg-black border border-stone-700 rounded p-1.5 text-white';
+                label.appendChild(input);
+                form.appendChild(label);
+            });
+            const submit = document.createElement('button');
+            submit.type = 'submit';
+            submit.className = 'sm:col-span-2 bg-cyan-700 hover:bg-cyan-600 rounded p-2 text-white font-bold';
+            submit.textContent = 'Guardar perfil destacado y acceso creator';
+            form.appendChild(submit);
+            wrapper.appendChild(form);
+            container.appendChild(wrapper);
+        }
+
+        async function guardarPerfilColaborador(event, creatorId) {
+            event.preventDefault();
+            const form = event.currentTarget;
+            const socialLinks = Object.fromEntries([...form.querySelectorAll('[data-network]')]
+                .filter(input => input.value.trim())
+                .map(input => [input.dataset.network, input.value.trim()]));
+            const userId = form.querySelector('[data-field="userId"]').value || null;
+            const payload = {
+                bio: form.querySelector('[data-field="bio"]').value.trim(),
+                featured: form.querySelector('[data-field="featured"]').checked,
+                socialLinks,
+                userId
+            };
+            const button = form.querySelector('button[type="submit"]');
+            button.disabled = true;
+            try {
+                await window.cyberWinAuth.request(`/api/admin/creators/${encodeURIComponent(creatorId)}/profile`, {
+                    method: 'PUT',
+                    body: JSON.stringify(payload)
+                });
+                await renderizarAfiliadosTikTok();
+                alert('✅ Perfil de colaborador actualizado.');
+            } catch (error) {
+                alert(`❌ No se pudo guardar el perfil: ${error.message}`);
+            } finally {
+                button.disabled = false;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            aplicarTemaGuardado();
+            window.addEventListener('storage', actualizarDatosCompartidos);
+            const firebaseConfig = window.CYBERWIN_FIREBASE_CONFIG;
+            const firebaseConfigured = firebaseConfig?.apiKey && !firebaseConfig.apiKey.startsWith('REPLACE_')
+                && firebaseConfig.projectId && !firebaseConfig.projectId.startsWith('REPLACE_')
+                && firebaseConfig.appId && !firebaseConfig.appId.startsWith('REPLACE_');
+            if (!firebaseConfigured) {
+                document.getElementById('admin-auth-message').textContent = 'Configura Firebase en firebase-config.js para habilitar el acceso administrativo.';
+                document.getElementById('admin-login-form').addEventListener('submit', event => event.preventDefault());
+            }
+        });
+
+        /**
+         * @param {string} tema
+         * @returns {tema is TemaCyberWin}
+         */
+        function esTemaCyberWin(tema) {
+            return temasDisponibles.some(temaValido => temaValido === tema);
+        }
+
+        /** @param {string} tema */
+        function cambiarTema(tema) {
+            if (!esTemaCyberWin(tema)) return;
+            const paleta = {
+                red: '#dc2626', ocean: '#0891b2', forest: '#16a34a', violet: '#9333ea',
+                rose: '#e11d48', gold: '#d97706', cyber: '#06b6d4', arctic: '#38bdf8',
+                sunset: '#f97316', mono: '#a1a1aa'
+            };
+            localStorage.setItem('liga_bs_tema', tema);
+            document.body.dataset.theme = tema;
+            document.body.style.setProperty('--custom-accent', paleta[tema]);
+            ['selector-tema-admin', 'selector-tema-admin-login'].forEach(id => {
+                const selector = document.getElementById(id);
+                if (selector) selector.value = tema;
+            });
+        }
+
+        function aplicarTemaAleatorio() {
+            const temas = temasDisponibles.filter(tema => tema !== document.body.dataset.theme);
+            cambiarTema(temas[Math.floor(Math.random() * temas.length)]);
+        }
+
+        function aplicarTemaGuardado() {
+            const temaGuardado = localStorage.getItem('liga_bs_tema');
+            const tema = esTemaCyberWin(temaGuardado) ? temaGuardado : 'red';
+            const paleta = {
+                red: '#dc2626', ocean: '#0891b2', forest: '#16a34a', violet: '#9333ea',
+                rose: '#e11d48', gold: '#d97706', cyber: '#06b6d4', arctic: '#38bdf8',
+                sunset: '#f97316', mono: '#a1a1aa'
+            };
+            document.body.dataset.theme = tema;
+            document.body.style.setProperty('--custom-accent', paleta[tema]);
+            ['selector-tema-admin', 'selector-tema-admin-login'].forEach(id => {
+                const selector = document.getElementById(id);
+                if (selector) selector.value = tema;
+            });
+        }
+
+        function mostrarVistaAdmin(idVista) {
+            document.querySelectorAll('.admin-view').forEach(vista => vista.classList.toggle('hidden', vista.id !== idVista));
+            document.querySelectorAll('.admin-nav-btn').forEach(boton => {
+                const activo = boton.dataset.adminView === idVista;
+                if (activo) boton.setAttribute('aria-current', 'page');
+                else boton.removeAttribute('aria-current');
+            });
+            if (idVista === 'admin-stream-assets') renderizarGrabacionesAdmin();
+            if (idVista === 'admin-usuarios') renderizarUsuariosReales();
+            if (idVista === 'admin-creadores') renderizarAfiliadosTikTok();
+        }
+
+        function actualizarDatosCompartidos(evento) {
+            if (evento.key === 'liga_bs_avisos' || evento.key === null) renderizarAvisosAdmin();
+            if (evento.key === 'liga_bs_usuarios' || evento.key === 'liga_bs_usuario_activo' || evento.key === null) renderizarUsuariosReales();
+            if (evento.key === 'liga_bs_afiliados_tiktok' || evento.key === null) renderizarAfiliadosTikTok();
+            if (evento.key === 'liga_bs_eventos' || evento.key === null) renderizarEventosAdmin();
+            if (evento.key === 'liga_bs_propuestas_torneos' || evento.key === null) renderizarPropuestasTorneos();
+            if (evento.key === 'liga_bs_bugs' || evento.key === null) renderizarBugsPrivados();
+            if (evento.key === 'liga_bs_tema') aplicarTemaGuardado();
+        }
+
+        async function cargarEstadoCompartidoAdmin() {
+            const { state } = await window.cyberWinAuth.request('/api/admin/state');
+            if (!migracionEstadoLocalCompletada) {
+                const legacyState = [
+                    ['events', 'liga_bs_eventos'],
+                    ['proposals', 'liga_bs_propuestas_torneos'],
+                    ['bugs', 'liga_bs_bugs'],
+                    ['creator-applications', 'liga_bs_afiliados_tiktok']
+                ];
+                for (const [key, storageKey] of legacyState) {
+                    const oldValue = JSON.parse(localStorage.getItem(storageKey) || '[]');
+                    if (Array.isArray(oldValue) && oldValue.length && (!Array.isArray(state[key]) || !state[key].length)) {
+                        state[key] = oldValue;
+                        await persistirEstadoAdmin(key, oldValue);
+                    }
+                }
+                const legacySettings = {
+                    advertisement: localStorage.getItem('liga_bs_publicidad') || '',
+                    discord: localStorage.getItem('liga_bs_discord_aprobado') || ''
+                };
+                if (!Object.keys(state['public-settings'] || {}).length
+                    && (legacySettings.advertisement || legacySettings.discord)) {
+                    state['public-settings'] = legacySettings;
+                    await persistirEstadoAdmin('public-settings', legacySettings);
+                }
+                migracionEstadoLocalCompletada = true;
+            }
+            listaEventos = state.events || [];
+            listaPropuestas = state.proposals || [];
+            listaBugs = state.bugs || [];
+            listaAfiliadosTikTok = state['creator-applications'] || [];
+            configuracionPublica = state['public-settings'] || {};
+            localStorage.setItem('liga_bs_eventos', JSON.stringify(listaEventos));
+            localStorage.setItem('liga_bs_propuestas_torneos', JSON.stringify(listaPropuestas));
+            localStorage.setItem('liga_bs_bugs', JSON.stringify(listaBugs));
+            localStorage.setItem('liga_bs_afiliados_tiktok', JSON.stringify(listaAfiliadosTikTok));
+            localStorage.setItem('liga_bs_publicidad', configuracionPublica.advertisement || '');
+            localStorage.setItem('liga_bs_discord_aprobado', configuracionPublica.discord || '');
+        }
+
+        function publicarEstadoAdmin(key, value) {
+            return persistirEstadoAdmin(key, value).catch(error => {
+                console.error(`No se pudo guardar el estado "${key}" en el servidor:`, error);
+                alert(`❌ No se pudo sincronizar con el servidor: ${error.message}`);
+            });
+        }
+
+        function persistirEstadoAdmin(key, value) {
+            const previous = colasGuardadoEstado.get(key) || Promise.resolve();
+            const current = previous.catch(() => {}).then(() => window.cyberWinAuth.request(
+                `/api/admin/state/${encodeURIComponent(key)}`,
+                { method: 'PUT', body: JSON.stringify({ value }) }
+            ));
+            colasGuardadoEstado.set(key, current);
+            return current;
+        }
+
+        async function activarPanelAdminCompleto() {
+            document.getElementById('seccion-login').classList.add('hidden');
+            document.getElementById('panel-principal-admin').classList.remove('hidden');
+            try {
+                await cargarEstadoCompartidoAdmin();
+            } catch (error) {
+                document.getElementById('panel-principal-admin').classList.add('hidden');
+                document.getElementById('seccion-login').classList.remove('hidden');
+                document.getElementById('admin-auth-message').textContent = `No se pudo cargar la información compartida: ${error.message}`;
+                document.getElementById('admin-auth-message').classList.add('text-red-400');
+                return;
+            }
+            document.getElementById('input-publicidad').value = localStorage.getItem('liga_bs_publicidad') || "";
+            document.getElementById('input-discord').value = localStorage.getItem('liga_bs_discord_aprobado') || "";
+            
+            mostrarVistaAdmin('admin-configuracion');
+            renderizarEventosAdmin();
+            renderizarBugsPrivados();
+            renderizarUsuariosReales();
+            renderizarPropuestasTorneos();
+            renderizarAfiliadosTikTok();
+            renderizarAvisosAdmin();
+            renderizarEstadoDispositivo();
+            clearInterval(intervaloEstadoDispositivo);
+            intervaloEstadoDispositivo = setInterval(() => {
+                if (!document.getElementById('admin-usuarios').classList.contains('hidden')) renderizarUsuariosReales();
+                if (!document.getElementById('admin-stream-assets').classList.contains('hidden')) renderizarGrabacionesAdmin();
+                if (!document.getElementById('admin-creadores').classList.contains('hidden')) renderizarAfiliadosTikTok();
+            }, 15000);
+            clearInterval(intervaloEstadoCompartido);
+            intervaloEstadoCompartido = setInterval(async () => {
+                try {
+                    await cargarEstadoCompartidoAdmin();
+                    renderizarEventosAdmin();
+                    renderizarBugsPrivados();
+                    renderizarPropuestasTorneos();
+                    await renderizarAfiliadosTikTok();
+                } catch (error) {
+                    console.error('No se pudo actualizar el estado compartido:', error);
+                }
+            }, 30000);
+        }
+
+        function cerrarSesionAdmin() {
+            clearInterval(intervaloEstadoDispositivo);
+            clearInterval(intervaloEstadoCompartido);
+            if (window.cyberWinAuth) {
+                window.cyberWinAuth.signOut().finally(() => window.location.reload());
+            } else {
+                window.location.reload();
+            }
+        }
+
+        async function guardarAnuncioPublicitario(e) {
+            e.preventDefault();
+            const txt = document.getElementById('input-publicidad').value.trim();
+            configuracionPublica = { ...configuracionPublica, advertisement: txt };
+            try {
+                await window.cyberWinAuth.request('/api/admin/state/public-settings', {
+                    method: 'PUT',
+                    body: JSON.stringify({ value: configuracionPublica })
+                });
+            } catch (error) {
+                alert(`❌ No se pudo guardar el anuncio en el servidor: ${error.message}`);
+                return;
+            }
+            localStorage.setItem('liga_bs_publicidad', txt);
+            alert("📢 Barra de anuncios actualizada con éxito.");
+        }
+
+        async function guardarDiscordOficial(e) {
+            e.preventDefault();
+            const url = document.getElementById('input-discord').value.trim();
+            if (url && !esEnlaceHttpSeguro(url)) {
+                alert('❌ El enlace de Discord debe ser una URL HTTP o HTTPS válida.');
+                return;
+            }
+            configuracionPublica = { ...configuracionPublica, discord: url };
+            try {
+                await window.cyberWinAuth.request('/api/admin/state/public-settings', {
+                    method: 'PUT',
+                    body: JSON.stringify({ value: configuracionPublica })
+                });
+            } catch (error) {
+                alert(`❌ No se pudo guardar el enlace en el servidor: ${error.message}`);
+                return;
+            }
+            localStorage.setItem('liga_bs_discord_aprobado', url);
+            alert("💬 Servidor de Discord vinculado globalmente.");
+        }
+
+        function archivoABase64(file) {
+            return new Promise((resolve, reject) => {
+                if (!file) {
+                    reject(new Error('No se recibió ningún archivo.'));
+                    return;
+                }
+
+                if (file.size > TAMANO_MAXIMO_IMAGEN) {
+                    reject(new Error(`El archivo "${file.name}" supera el límite de 500 KB.`));
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => reject(new Error(`No se pudo leer el archivo "${file.name}".`));
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function crearNuevoEvento(e) {
+            e.preventDefault();
+            
+            const fileInput = document.getElementById('ev-banner-file');
+            let bannerBase64 = "";
+            
+            if (fileInput.files.length > 0) {
+                try {
+                    bannerBase64 = await archivoABase64(fileInput.files[0]);
+                } catch (err) {
+                    console.error("Error cargando el banner local:", err);
+                    alert(`❌ ${err.message || 'No se pudo cargar el banner.'}`);
+                    return;
+                }
+            }
+            
+            const nuevo = {
+                id: Date.now(),
+                nombre: document.getElementById('ev-nombre').value.trim(),
+                tipo: document.getElementById('ev-tipo').value,
+                banner: bannerBase64,
+                fecha: document.getElementById('ev-fecha').value,
+                hora: document.getElementById('ev-hora').value,
+                limite: parseInt(document.getElementById('ev-limite').value),
+                contacto: document.getElementById('ev-contacto').value.trim(),
+                premios: document.getElementById('ev-premios').value.trim(),
+                reglas: document.getElementById('ev-reglas').value.trim(),
+                estado: 'INSCRIPCIONES ABIERTAS',
+                equipos: [],
+                bracketRondas: {}
+            };
+
+            listaEventos.push(nuevo);
+            localStorage.setItem('liga_bs_eventos', JSON.stringify(listaEventos));
+            try {
+                await persistirEstadoAdmin('events', listaEventos);
+            } catch (error) {
+                alert(`❌ No se pudo guardar el torneo: ${error.message}`);
+                listaEventos.pop();
+                localStorage.setItem('liga_bs_eventos', JSON.stringify(listaEventos));
+                return;
+            }
+            
+            alert("🪐 ¡Competencia dada de alta de manera satisfactoria!");
+            e.target.reset();
+            renderizarEventosAdmin();
+        }
+
+        async function agregarCreadorManual(e) {
+            e.preventDefault();
+            const usuario = document.getElementById('tk-user').value.replace('@', '').trim();
+            const fontNombre = document.getElementById('tk-nombre').value.trim();
+            const rango = document.getElementById('tk-rango').value;
+            const liveUrl = document.getElementById('tk-live-url').value.trim();
+            const isLive = document.getElementById('tk-is-live').checked;
+            if (liveUrl && !esEnlaceHttpSeguro(liveUrl)) {
+                alert("❌ El enlace del directo debe comenzar con http:// o https://.");
+                return;
+            }
+            if (isLive && !liveUrl) {
+                alert("❌ Agrega un enlace del directo antes de marcarlo EN VIVO.");
+                return;
+            }
+
+            try {
+                await window.cyberWinAuth.request('/api/admin/creators', {
+                    method: 'POST',
+                    body: JSON.stringify({ handle: usuario, displayName: fontNombre, category: rango, liveUrl, isLive })
+                });
+                e.target.reset();
+                await renderizarAfiliadosTikTok();
+                alert("✅ Creador guardado en PostgreSQL.");
+            } catch (error) {
+                alert(`❌ ${error.message}`);
+            }
+        }
+
+        async function renderizarAfiliadosTikTok() {
+            const contenedor = document.getElementById('contenedor-solicitudes-tiktok');
+            contenedor.innerHTML = "";
+            let creadoresDb = [];
+            let postulaciones = [];
+            let cargaFallida = false;
+            try {
+                const [creatorResult, userResult, applicationResult] = await Promise.all([
+                    window.cyberWinAuth.request('/api/admin/creators'),
+                    window.cyberWinAuth.request('/api/admin/users'),
+                    window.cyberWinAuth.request('/api/admin/creator-applications')
+                ]);
+                creadoresDb = creatorResult.creators;
+                postulaciones = applicationResult.applications;
+                creadoresDb.forEach(creator => renderizarEditorColaborador(creator, userResult.users, contenedor));
+                postulaciones.forEach(application => renderizarPostulacionCreador(application, contenedor));
+            } catch (error) {
+                cargaFallida = true;
+                console.error('No se pudieron cargar los creadores de PostgreSQL:', error);
+                const aviso = document.createElement('p');
+                aviso.className = 'text-amber-400 text-[10px]';
+                aviso.textContent = `No se pudo cargar el catálogo SQL: ${error.message}`;
+                contenedor.appendChild(aviso);
+            }
+
+            creadoresDb.forEach(af => {
+                const item = document.createElement('div');
+                item.className = "bg-black/60 p-2.5 rounded border border-stone-850 flex items-center justify-between gap-2 text-[11px] animate-fade-in";
+                const details = document.createElement('div');
+                details.className = 'truncate';
+                const name = document.createElement('span');
+                name.className = 'font-bold text-white block truncate';
+                name.textContent = `${af.display_name} (@${af.handle})`;
+                const category = document.createElement('span');
+                category.className = 'text-[9px] text-amber-500 font-medium block uppercase tracking-wider';
+                category.textContent = af.category;
+                details.append(name, category);
+                if (af.featured) {
+                    const badge = document.createElement('span');
+                    badge.className = 'inline-block text-[9px] text-cyan-300 bg-cyan-950 rounded-full px-2 py-0.5 mt-1';
+                    badge.textContent = 'Colaborador destacado';
+                    details.appendChild(badge);
+                }
+                if (af.live_url) {
+                    const link = document.createElement('a');
+                    link.href = af.live_url;
+                    link.target = '_blank';
+                    link.rel = 'noopener noreferrer';
+                    link.className = 'text-[10px] text-red-400 underline block mt-1';
+                    link.textContent = '🔴 Abrir live / streaming';
+                    details.appendChild(link);
+                }
+                const liveToggle = document.createElement('button');
+                liveToggle.type = 'button';
+                liveToggle.className = `shrink-0 rounded px-2 py-1 text-[9px] font-bold ${af.is_live ? 'bg-red-700 text-white' : 'bg-stone-800 text-stone-300'}`;
+                liveToggle.textContent = af.is_live ? '🔴 EN VIVO · Apagar' : af.live_url ? 'Marcar EN VIVO' : 'Agregar enlace';
+                liveToggle.addEventListener('click', () => cambiarEstadoLive(af.id, !af.is_live, af.live_url));
+                const remove = document.createElement('button');
+                remove.type = 'button';
+                remove.className = 'text-stone-500 hover:text-red-400 font-bold text-xs px-1';
+                remove.textContent = '×';
+                remove.setAttribute('aria-label', `Eliminar a ${af.display_name}`);
+                remove.addEventListener('click', () => eliminarCreadorBaseDatos(af.id));
+                const actions = document.createElement('div');
+                actions.className = 'flex shrink-0 items-center gap-2';
+                actions.append(liveToggle, remove);
+                item.append(details, actions);
+                contenedor.appendChild(item);
+            });
+
+            if (!cargaFallida && !creadoresDb.length && !postulaciones.length) {
+                contenedor.innerHTML = `<div class="text-stone-600 italic py-2 text-center">No hay creadores ni postulaciones en el sistema.</div>`;
+            }
+        }
+
+        function renderizarPostulacionCreador(application, container) {
+            const item = document.createElement('article');
+            item.className = 'bg-amber-950/30 border border-amber-800/60 rounded-lg p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs';
+            const details = document.createElement('div');
+            details.className = 'min-w-0';
+            const name = document.createElement('p');
+            name.className = 'font-bold text-white truncate';
+            name.textContent = `${application.displayName} · @${application.socialHandle}`;
+            const account = document.createElement('p');
+            account.className = 'text-[10px] text-stone-400';
+            account.textContent = `${application.nickname || 'Perfil sin completar'} · ${application.email} · ${new Date(application.submittedAt).toLocaleString()}`;
+            details.append(name, account);
+            const actions = document.createElement('div');
+            actions.className = 'flex shrink-0 gap-2';
+            [['approved', 'Aprobar como creador', 'bg-emerald-700 hover:bg-emerald-600 text-white'],
+                ['rejected', 'Rechazar', 'bg-red-950 hover:bg-red-900 text-red-300']].forEach(([decision, label, style]) => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = `${style} rounded px-3 py-2 text-[10px] font-bold`;
+                button.textContent = label;
+                button.addEventListener('click', () => revisarPostulacionCreador(application, decision, button));
+                actions.appendChild(button);
+            });
+            item.append(details, actions);
+            container.appendChild(item);
+        }
+
+        async function revisarPostulacionCreador(application, decision, button) {
+            if (decision === 'rejected' && !confirm(`¿Rechazar la postulación de ${application.displayName}?`)) return;
+            button.disabled = true;
+            try {
+                await window.cyberWinAuth.request(`/api/admin/creator-applications/${encodeURIComponent(application.id)}/review`, {
+                    method: 'POST',
+                    body: JSON.stringify({ decision })
+                });
+            } catch (error) {
+                alert(`❌ No se pudo revisar la postulación: ${error.message}`);
+                button.disabled = false;
+                return;
+            }
+            try {
+                await Promise.all([renderizarAfiliadosTikTok(), renderizarUsuariosReales()]);
+            } catch (error) {
+                alert(`La decisión se guardó, pero no se pudo actualizar el panel: ${error.message}`);
+            }
+        }
+
+        async function cambiarRolUsuario(usuario, role, button) {
+            button.disabled = true;
+            try {
+                await window.cyberWinAuth.request(`/api/admin/users/${encodeURIComponent(usuario.id)}/role`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({ role })
+                });
+            } catch (error) {
+                alert(`❌ No se pudo actualizar el rol: ${error.message}`);
+                button.disabled = false;
+                return;
+            }
+            try {
+                await renderizarUsuariosReales();
+            } catch (error) {
+                alert(`El rol se guardó, pero no se pudo actualizar el panel: ${error.message}`);
+            }
+        }
+
+        async function cambiarEstadoLive(id, isLive, currentUrl) {
+            let liveUrl;
+            if (isLive && !currentUrl) {
+                liveUrl = prompt('Ingresa el enlace del directo activo:')?.trim();
+                if (!liveUrl) return;
+                if (!esEnlaceHttpSeguro(liveUrl)) {
+                    alert('❌ El enlace del directo debe comenzar con http:// o https://.');
+                    return;
+                }
+            }
+            try {
+                await window.cyberWinAuth.request(`/api/admin/creators/${encodeURIComponent(id)}/live`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({ isLive, liveUrl })
+                });
+                await renderizarAfiliadosTikTok();
+            } catch (error) {
+                alert(`❌ No se pudo actualizar el estado del directo: ${error.message}`);
+            }
+        }
+
+        async function eliminarCreadorBaseDatos(id) {
+            if (!confirm('¿Eliminar este creador oficial?')) return;
+            try {
+                await window.cyberWinAuth.request(`/api/admin/creators/${encodeURIComponent(id)}`, { method: 'DELETE' });
+                await renderizarAfiliadosTikTok();
+            } catch (error) {
+                alert(`❌ No se pudo eliminar el creador: ${error.message}`);
+            }
+        }
+
+        async function renderizarUsuariosReales() {
+            const contenedor = document.getElementById('contenedor-usuarios-reales');
+            contenedor.innerHTML = "";
+            try {
+                const result = await window.cyberWinAuth.request('/api/admin/monitoring');
+                const server = result.server;
+                const megabytes = value => `${(value / 1024 / 1024).toFixed(1)} MB`;
+                const gigs = value => `${(value / 1024 / 1024 / 1024).toFixed(2)} GB`;
+                const cards = [
+                    ['Servidor', `${server.hostname} · ${server.platform} · ${server.nodeVersion}`],
+                    ['CPU del servidor', server.cpuUsagePercent === null ? 'Calculando muestra…' : `${server.cpuUsagePercent}% · ${server.cpuCount} núcleos`],
+                    ['Memoria del sistema', `${gigs(server.totalMemoryBytes - server.freeMemoryBytes)} usada / ${gigs(server.totalMemoryBytes)} total`],
+                    ['Memoria del proceso Node', `${megabytes(server.processMemoryBytes.rss)} RSS · ${megabytes(server.processMemoryBytes.heapUsed)} heap`],
+                    ['Disponibilidad del proceso', `${(server.processUptimeSeconds / 3600).toFixed(1)} h · sistema ${(server.systemUptimeSeconds / 3600).toFixed(1)} h`],
+                    ['Cuentas registradas', `${result.totalCount} total · ${result.onlineCount} en línea · ${result.offlineCount} desconectadas`],
+                    ['Base de datos PostgreSQL', `${server.databaseResponseMs} ms · conectado`],
+                    ['Carga media del sistema', server.loadAverage ? server.loadAverage.join(' · ') : 'No expuesta por este sistema operativo']
+                ];
+                document.getElementById('server-monitor-cards').innerHTML = cards.map(([label, value]) =>
+                    `<div class="bg-black/50 border border-stone-800 rounded p-2"><span class="text-stone-500 block">${sanitizarHTML(label)}</span><strong class="text-stone-200">${sanitizarHTML(value)}</strong></div>`
+                ).join('');
+                document.getElementById('presence-summary').innerHTML =
+                    `<span class="rounded-full bg-emerald-950 text-emerald-300 px-3 py-1">${result.onlineCount} en línea</span><span class="rounded-full bg-stone-800 text-stone-300 px-3 py-1">${result.offlineCount} desconectados</span>`;
+                const users = result.users;
+                if (!users.length) {
+                    contenedor.innerHTML = `<div class="col-span-full text-stone-500 italic text-[11px] py-2">Todavía no hay cuentas registradas en PostgreSQL.</div>`;
+                    return;
+                }
+                users.forEach(usuario => {
+                    const online = usuario.online === true;
+                    const lastSeen = usuario.last_seen_at ? new Date(usuario.last_seen_at).toLocaleString() : 'Sin actividad registrada';
+                    const card = document.createElement('div');
+                    card.className = `bg-black/60 border border-stone-800 p-3 rounded flex flex-col justify-center border-l-2 ${online ? 'border-emerald-500' : 'border-stone-600'} shadow-md animate-fade-in`;
+                    card.innerHTML = `
+                        <span class="font-bold text-white block truncate">${sanitizarHTML(usuario.nickname || 'Perfil sin completar')}</span>
+                        <span class="text-amber-400 font-mono text-[10px] block mt-0.5">${sanitizarHTML(usuario.player_tag || 'Sin Player Tag')}</span>
+                        <span class="text-stone-500 text-[9px] block mt-1 truncate">${sanitizarHTML(usuario.email || '')}</span>
+                        <span class="font-bold text-[9px] mt-1 ${online ? 'text-emerald-400' : 'text-stone-500'}">${online ? '● EN LÍNEA' : '○ DESCONECTADO'}</span>
+                        <span class="text-stone-500 text-[9px] block mt-1">Última actividad: ${sanitizarHTML(lastSeen)}</span>
+                        <span class="text-[9px] text-stone-500 mt-1 uppercase font-semibold">Rol: ${sanitizarHTML(usuario.role)}</span>
+                        ${usuario.is_creator ? '<span class="text-[9px] text-cyan-400 font-bold mt-1">Creador vinculado</span>' : ''}
+                    `;
+                    const roleControls = document.createElement('div');
+                    roleControls.className = 'mt-2 flex gap-2';
+                    const roleSelect = document.createElement('select');
+                    roleSelect.className = 'min-w-0 flex-1 rounded bg-stone-900 border border-stone-700 px-2 py-1 text-[10px] text-stone-200';
+                    [['player', 'Jugador'], ['creator', 'Creador de contenido'],
+                        ...(usuario.role === 'admin' ? [['admin', 'Administrador']] : [])]
+                        .forEach(([value, label]) => {
+                            const option = document.createElement('option');
+                            option.value = value;
+                            option.textContent = label;
+                            option.selected = usuario.role === value;
+                            roleSelect.appendChild(option);
+                        });
+                    const saveRole = document.createElement('button');
+                    saveRole.type = 'button';
+                    saveRole.className = 'rounded bg-cyan-900 hover:bg-cyan-800 px-2 py-1 text-[10px] font-bold text-cyan-100';
+                    saveRole.textContent = 'Guardar rol';
+                    saveRole.disabled = usuario.role === 'admin';
+                    saveRole.addEventListener('click', () => cambiarRolUsuario(usuario, roleSelect.value, saveRole));
+                    roleControls.append(roleSelect, saveRole);
+                    card.appendChild(roleControls);
+                    contenedor.appendChild(card);
+                });
+            } catch (error) {
+                console.error('No se pudieron cargar las cuentas SQL:', error);
+                contenedor.innerHTML = `<div class="col-span-full text-amber-400 text-[11px] py-2">No se pudieron cargar usuarios: ${sanitizarHTML(error.message)}</div>`;
+            }
+        }
+
+        async function renderizarGrabacionesAdmin() {
+            const container = document.getElementById('admin-stream-recordings');
+            container.replaceChildren();
+            try {
+                const data = await window.cyberWinAuth.request('/api/admin/stream-assets');
+                if (!data.videos.length) {
+                    container.textContent = 'Todavía no hay grabaciones almacenadas.';
+                    return;
+                }
+                data.videos.forEach(video => {
+                    const card = document.createElement('article');
+                    card.className = 'bg-black/50 border border-stone-800 rounded-xl p-3 space-y-2';
+                    const title = document.createElement('h4');
+                    title.className = 'text-xs font-bold text-white';
+                    title.textContent = `${video.title} · ${video.creator}`;
+                    const status = document.createElement('p');
+                    status.className = 'text-[10px] text-stone-400';
+                    status.textContent = `${video.status} · ${new Date(video.createdAt).toLocaleString()}`;
+                    const remove = document.createElement('button');
+                    remove.type = 'button';
+                    remove.className = 'bg-red-950 border border-red-900 rounded px-3 py-1 text-[10px] font-bold text-red-300';
+                    remove.textContent = 'Eliminar vídeo de Mux';
+                    remove.addEventListener('click', () => eliminarGrabacionAdmin(video.id, video.title));
+                    card.append(title, status);
+                    if (video.status === 'ready' && video.playbackId) {
+                        const player = document.createElement('mux-player');
+                        player.setAttribute('playback-id', video.playbackId);
+                        player.setAttribute('stream-type', 'on-demand');
+                        player.setAttribute('controls', '');
+                        player.className = 'block w-full aspect-video rounded-lg overflow-hidden bg-black';
+                        card.appendChild(player);
+                    }
+                    card.appendChild(remove);
+                    container.appendChild(card);
+                });
+            } catch (error) {
+                container.textContent = `No se pudieron cargar las grabaciones: ${error.message}`;
+            }
+        }
+
+        async function eliminarGrabacionAdmin(assetId, title) {
+            if (!confirm(`Se borrará permanentemente "${title}" de Mux. Esta acción no se puede deshacer. ¿Continuar?`)) return;
+            try {
+                await window.cyberWinAuth.request(`/api/admin/stream-assets/${encodeURIComponent(assetId)}`, { method: 'DELETE' });
+                await renderizarGrabacionesAdmin();
+            } catch (error) {
+                alert(`❌ No se pudo eliminar la grabación: ${error.message}`);
+            }
+        }
+
+        function renderizarEstadoDispositivo() {
+            const contenedor = document.getElementById('estado-dispositivo');
+            if (!contenedor) return;
+            const conexion = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+            const valores = [
+                ['Estado de red', navigator.onLine ? 'En línea' : 'Sin conexión'],
+                ['Tipo de conexión', conexion && conexion.effectiveType ? conexion.effectiveType.toUpperCase() : 'No disponible'],
+                ['Latencia estimada', conexion && Number.isFinite(conexion.rtt) ? `${conexion.rtt} ms` : 'No disponible'],
+                ['Ancho de banda estimado', conexion && Number.isFinite(conexion.downlink) ? `${conexion.downlink} Mbps` : 'No disponible'],
+                ['Núcleos informados', navigator.hardwareConcurrency || 'No disponible'],
+                ['Memoria informada', navigator.deviceMemory ? `${navigator.deviceMemory} GB` : 'No disponible'],
+                ['Resolución', `${screen.width} × ${screen.height}`],
+                ['Plataforma reportada', navigator.platform || 'No disponible'],
+                ['Última actualización', new Date().toLocaleTimeString()]
+            ];
+            contenedor.innerHTML = valores.map(([etiqueta, valor]) => `<div class="bg-black/50 border border-stone-800 rounded p-2"><span class="text-stone-500 block">${sanitizarHTML(etiqueta)}</span><strong class="text-stone-200">${sanitizarHTML(valor)}</strong></div>`).join('');
+        }
+
+        /**
+         * @param {string} valor
+         * @returns {boolean}
+         */
+        function esEnlaceHttpSeguro(valor) {
+            try {
+                const url = new URL(valor);
+                return url.protocol === 'https:' || url.protocol === 'http:';
+            } catch {
+                return false;
+            }
+        }
+
+        /** @param {SubmitEvent} e */
+        async function publicarAviso(e) {
+            e.preventDefault();
+            const titulo = document.getElementById('aviso-titulo').value.trim();
+            const mensaje = document.getElementById('aviso-mensaje').value.trim();
+            if (!titulo || !mensaje) return;
+            try {
+                await window.cyberWinAuth.request('/api/admin/announcements', {
+                    method: 'POST',
+                    body: JSON.stringify({ title: titulo, message: mensaje })
+                });
+                e.target.reset();
+                await renderizarAvisosAdmin();
+            } catch (error) {
+                alert(`❌ No se pudo publicar el aviso: ${error.message}`);
+            }
+        }
+
+        async function renderizarAvisosAdmin() {
+            const contenedor = document.getElementById('lista-avisos-admin');
+            if (!contenedor) return;
+            contenedor.innerHTML = '<p class="text-[10px] text-stone-500 italic">Cargando avisos…</p>';
+            try {
+                const result = await window.cyberWinAuth.request('/api/admin/announcements');
+                const avisos = result.announcements;
+                contenedor.innerHTML = avisos.length ? '' : '<p class="text-[10px] text-stone-500 italic">Todavía no hay avisos publicados.</p>';
+                avisos.forEach(aviso => {
+                const tarjeta = document.createElement('article');
+                tarjeta.className = 'flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 bg-black/50 border border-stone-800 p-3 rounded';
+                tarjeta.innerHTML = `<div><h4 class="text-white font-bold">${sanitizarHTML(aviso.title)}</h4><p class="text-stone-300 text-xs mt-1 whitespace-pre-line">${sanitizarHTML(aviso.message)}</p><time class="text-[9px] text-stone-500 mt-1 block">${sanitizarHTML(new Date(aviso.created_at).toLocaleString())}</time></div><button type="button" class="bg-red-950 text-red-300 rounded px-2 py-1 text-[10px]">Eliminar</button>`;
+                tarjeta.querySelector('button').addEventListener('click', () => eliminarAviso(aviso.id));
+                contenedor.appendChild(tarjeta);
+                });
+            } catch (error) {
+                console.error('No se pudieron cargar avisos SQL:', error);
+                contenedor.innerHTML = `<p class="text-[10px] text-red-400">Error cargando avisos: ${sanitizarHTML(error.message)}</p>`;
+            }
+        }
+
+        async function eliminarAviso(id) {
+            if (!confirm('¿Eliminar este aviso de PostgreSQL?')) return;
+            try {
+                await window.cyberWinAuth.request(`/api/admin/announcements/${encodeURIComponent(id)}`, { method: 'DELETE' });
+                await renderizarAvisosAdmin();
+            } catch (error) {
+                alert(`❌ No se pudo eliminar el aviso: ${error.message}`);
+            }
+        }
+
+        function renderizarEventosAdmin() {
+            listaEventos = JSON.parse(localStorage.getItem('liga_bs_eventos')) || [];
+            const contenedor = document.getElementById('contenedor-eventos-admin');
+            contenedor.innerHTML = "";
+
+            if (listaEventos.length === 0) {
+                contenedor.innerHTML = `<div class="text-stone-600 text-center italic text-xs py-4">No hay competencias creadas en la base de datos local.</div>`;
+                return;
+            }
+
+            listaEventos.forEach((ev, evIdx) => {
+                const div = document.createElement('div');
+                div.className = "bg-black/40 p-4 rounded border border-stone-850 space-y-4 text-xs animate-fade-in hover:border-stone-700 shadow-inner";
+                
+                let layoutBanner = ev.banner ? `<div class="overflow-hidden rounded h-24 mb-2 border border-stone-800 shadow-md"><img src="${ev.banner}" class="w-full h-full object-cover opacity-70 hover:opacity-90 hover:scale-105 transition duration-500"></div>` : '';
+
+                div.innerHTML = `
+                    ${layoutBanner}
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 bg-stone-950 p-2.5 rounded border-l-2 border-red-600 shadow">
+                        <div>
+                            <span class="text-[9px] font-mono text-stone-500 uppercase">${sanitizarHTML(ev.tipo)}</span>
+                            <h4 class="text-base font-bold text-white font-oriental tracking-wide">${sanitizarHTML(ev.nombre)}</h4>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button class="btn-editar-torneo bg-indigo-600 text-white hover:bg-indigo-500 px-2 py-1 rounded text-[10px] font-bold active:scale-95 shadow">⚙️ Editar</button>
+                            <button class="btn-imprimir-dinamico bg-amber-600 text-black hover:bg-amber-500 px-2 py-1 rounded text-[10px] font-bold active:scale-95 shadow">🖨️ Imprimir</button>
+                            <span class="text-[10px] font-bold text-amber-500 font-mono">ESTADO:</span>
+                            <select class="select-estado-dinamico bg-stone-900 border border-stone-700 text-stone-200 p-1 text-[11px] rounded focus:outline-none focus:border-red-600"></select>
+                            <button class="btn-eliminar-dinamico bg-red-950 text-red-400 border border-red-900 hover:bg-red-900 hover:text-white px-2 py-1 rounded text-[10px] font-bold active:scale-95">Eliminar</button>
+                        </div>
+                    </div>
+                `;
+
+                div.querySelector('.btn-editar-torneo').addEventListener('click', () => editarParametrosTorneo(ev.id));
+                div.querySelector('.btn-imprimir-dinamico').addEventListener('click', () => imprimirResultadosEvento(ev.id));
+
+                const select = div.querySelector('.select-estado-dinamico');
+                const opciones = ['INSCRIPCIONES ABIERTAS', 'EN JUEGO', 'POSPUESTO', 'CANCELADO'];
+                opciones.forEach(op => {
+                    const option = document.createElement('option');
+                    option.value = op;
+                    option.innerText = op;
+                    if (ev.estado === op) option.selected = true;
+                    select.appendChild(option);
+                });
+                select.addEventListener('change', (e) => cambiarEstadoEvento(ev.id, e.target.value));
+                div.querySelector('.btn-eliminar-dinamico').addEventListener('click', () => borrarEventoDefinitivo(ev.id));
+
+                if (esEventoEliminacion(ev)) {
+                    renderizarLogisticaCopaBrackets(div, ev);
+                } else {
+                    renderizarLogisticaLigaRegular(div, ev);
+                }
+
+                contenedor.appendChild(div);
+            });
+        }
+
+        function renderizarLogisticaLigaRegular(div, ev) {
+            const areaRosters = document.createElement('div');
+            areaRosters.className = "space-y-2";
+            const inscr = ev.equipos || [];
+            areaRosters.innerHTML = `<h5 class="font-bold text-stone-400 uppercase text-[10px] tracking-wider">Escuadras Registradas (${inscr.length} / ${ev.limite}):</h5>`;
+
+            if (inscr.length === 0) {
+                areaRosters.innerHTML += `<p class="text-stone-600 italic text-[11px] pl-2 animate-pulse">Ningún equipo se ha inscrito todavía.</p>`;
+            } else {
+                const grid = document.createElement('div');
+                grid.className = "grid sm:grid-cols-2 gap-3";
+
+                inscr.forEach((eq, eqIdx) => {
+                    const drawPosition = ev.ordenSorteo?.indexOf(eq.nombre) ?? -1;
+                    const itemEq = document.createElement('div');
+                    itemEq.className = "team-card bg-stone-900/80 p-3 rounded border border-stone-800 flex flex-col gap-2 hover:bg-stone-900 hover:border-stone-700 hover:shadow-lg hover:shadow-black/40 transform hover:-translate-y-0.5";
+                    
+                    let slotsPuntos = `
+                        <div class="flex items-center gap-1 mt-1 border-t border-stone-850 pt-2">
+                            <span class="text-[9px] text-stone-500 uppercase font-mono">Puntos:</span>
+                            <input type="number" value="${eq.puntos || 0}" class="input-puntos-dinamico w-12 p-1 bg-black text-center text-amber-400 border border-stone-700 rounded font-mono font-bold text-xs focus:outline-none focus:border-red-600">
+                        </div>
+                    `;
+
+                    let layoutImagen = eq.logo ? `
+                        <div class="flex items-center gap-2 bg-black/40 p-1.5 rounded mt-1 animate-fade-in">
+                            <img src="${eq.logo}" class="h-8 w-8 object-cover rounded border border-stone-700 shadow-inner">
+                            <button type="button" onclick="eliminarImagenEquipo(${ev.id}, ${eqIdx})" class="text-[9px] bg-red-950 hover:bg-red-800 border border-red-900 text-red-400 px-2 py-0.5 rounded font-bold transition active:scale-95">Quitar Logo</button>
+                        </div>
+                    ` : `
+                        <div class="mt-1 space-y-1">
+                            <label class="block text-[9px] text-stone-400 uppercase font-bold">Subir Logo de Equipo (Máx 300KB):</label>
+                            <input type="file" accept="image/*" onchange="subirImagenEquipoArchivo(event, ${ev.id}, ${eqIdx})" class="text-[9px] bg-stone-800 text-stone-300 rounded border border-stone-700 w-full p-1 file:bg-stone-700 file:border-0 file:text-[9px] file:text-stone-200 file:rounded file:px-1.5 file:py-0.5 cursor-pointer hover:bg-stone-750">
+                        </div>
+                    `;
+
+                    itemEq.innerHTML = `
+                        <div class="flex justify-between items-start gap-2 bg-black/30 p-1.5 rounded">
+                            <div class="truncate">
+                                <span class="font-bold text-stone-200 text-xs block truncate">${drawPosition >= 0 ? `#${drawPosition + 1} · ` : ''}${sanitizarHTML(eq.nombre)}</span>
+                                <span class="text-[9px] text-stone-500 font-mono block truncate">ID Líder: ${sanitizarHTML(eq.id1 || 'N/A')}</span>
+                            </div>
+                            <div class="flex gap-1 flex-shrink-0">
+                                <button type="button" class="btn-editar-nombre text-[9px] bg-stone-800 hover:bg-stone-700 text-amber-400 px-1.5 py-0.5 rounded transition">✏️ Name</button>
+                                <button type="button" onclick="descalificarClubCompleto(${ev.id}, ${eqIdx})" class="text-[9px] bg-red-900/40 hover:bg-red-700 border border-red-900 text-red-200 px-1.5 py-0.5 rounded font-bold transition">❌</button>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1 bg-black/10 p-1.5 rounded text-[10px]">
+                            <div class="flex justify-between items-center text-stone-300 border-b border-stone-850 pb-0.5 hover:text-white">
+                                <span class="truncate">👑 ${eq.j1 ? sanitizarHTML(eq.j1) : '<i class="text-stone-600">Vacante</i>'}</span>
+                                ${eq.j1 ? `<button type="button" onclick="expulsarJugadorSlot(${ev.id}, ${eqIdx}, 'j1')" class="text-red-500 hover:text-red-400 font-bold ml-1 hover:scale-125 transition">×</button>` : ''}
+                            </div>
+                            <div class="flex justify-between items-center text-stone-400 border-b border-stone-850 pb-0.5 hover:text-white">
+                                <span class="truncate">⚔️ ${eq.j2 ? sanitizarHTML(eq.j2) : '<i class="text-stone-600">Vacante</i>'}</span>
+                                ${eq.j2 ? `<button type="button" onclick="expulsarJugadorSlot(${ev.id}, ${eqIdx}, 'j2')" class="text-red-500 hover:text-red-400 font-bold ml-1 hover:scale-125 transition">×</button>` : ''}
+                            </div>
+                            <div class="flex justify-between items-center text-stone-400 border-b border-stone-850 pb-0.5 hover:text-white">
+                                <span class="truncate">⚔️ ${eq.j3 ? sanitizarHTML(eq.j3) : '<i class="text-stone-600">Vacante</i>'}</span>
+                                ${eq.j3 ? `<button type="button" onclick="expulsarJugadorSlot(${ev.id}, ${eqIdx}, 'j3')" class="text-red-500 hover:text-red-400 font-bold ml-1 hover:scale-125 transition">×</button>` : ''}
+                            </div>
+                            <div class="flex justify-between items-center text-stone-500 hover:text-white">
+                                <span class="truncate">🛡️ ${eq.j4 ? sanitizarHTML(eq.j4) : '<i class="text-stone-600">Vacante</i>'}</span>
+                                ${eq.j4 ? `<button type="button" onclick="expulsarJugadorSlot(${ev.id}, ${eqIdx}, 'j4')" class="text-red-500 hover:text-red-400 font-bold ml-1 hover:scale-125 transition">×</button>` : ''}
+                            </div>
+                        </div>
+
+                        <button type="button" onclick="agregarJugadorFuerza(${ev.id}, ${eqIdx})" class="text-[9px] bg-green-950/80 text-green-400 border border-green-900/60 hover:bg-green-900 hover:text-white px-2 py-1 rounded font-bold transition w-full text-center mt-1 active:scale-95 shadow-sm">➕ Forzar Entrada</button>
+
+                        ${layoutImagen}
+                        ${slotsPuntos}
+                    `;
+
+                    itemEq.querySelector('.btn-editar-nombre').addEventListener('click', () => {
+                        editarNombreClub(ev.id, eqIdx, eq.nombre);
+                    });
+
+                    const inputPuntos = itemEq.querySelector('.input-puntos-dinamico');
+                    inputPuntos.addEventListener('change', (e) => actualizarPuntosClub(ev.id, eq.nombre, parseInt(e.target.value) || 0));
+
+                    grid.appendChild(itemEq);
+                });
+                areaRosters.appendChild(grid);
+            }
+            if (ev.estado === 'EN JUEGO' && !ev.ordenSorteo?.length && inscr.length > 1) {
+                const draw = document.createElement('button');
+                draw.type = 'button';
+                draw.className = 'bg-amber-600 hover:bg-amber-500 text-black font-bold px-3 py-2 rounded text-[10px]';
+                draw.textContent = '🎲 Sortear posiciones iniciales';
+                draw.addEventListener('click', () => generarSorteoAleatorio(ev.id));
+                areaRosters.appendChild(draw);
+            } else if (ev.ordenSorteo?.length) {
+                const info = document.createElement('p');
+                info.className = 'text-[10px] text-amber-300';
+                info.textContent = 'Sorteo inicial aleatorio generado; la clasificación se ordena por puntos y luego por sorteo.';
+                areaRosters.appendChild(info);
+            }
+            div.appendChild(areaRosters);
+        }
+
+        function renderizarLogisticaCopaBrackets(div, ev) {
+            const areaBrackets = document.createElement('div');
+            areaBrackets.className = "space-y-4 pt-2 border-t border-stone-800";
+            const inscr = ev.equipos || [];
+            
+            areaBrackets.innerHTML = `
+                <div class="flex justify-between items-center bg-stone-900 p-2 rounded border border-amber-500/20">
+                    <span class="font-mono text-[11px] text-amber-400 uppercase font-bold">🛡️ Modo del Sistema: Torneo por Brackets</span>
+                    <span class="bg-stone-950 px-2 py-0.5 rounded font-mono text-stone-300">Inscritos: ${inscr.length} / ${ev.limite}</span>
+                </div>
+            `;
+
+            if (inscr.length < 2) {
+                areaBrackets.innerHTML += `<p class="text-stone-600 italic text-[11px] pl-2 py-2">Se necesitan al menos 2 equipos para estructurar los emparejamientos automáticos.</p>`;
+                div.appendChild(areaBrackets);
+                return;
+            }
+
+            if (!ev.bracketRondas || Object.keys(ev.bracketRondas).length === 0) {
+                if (ev.estado === 'EN JUEGO') {
+                    const generate = document.createElement('button');
+                    generate.type = 'button';
+                    generate.className = 'bg-amber-600 hover:bg-amber-500 text-black font-bold px-3 py-2 rounded text-[10px]';
+                    generate.textContent = '🎲 Generar bracket aleatorio';
+                    generate.addEventListener('click', () => generarSorteoAleatorio(ev.id));
+                    areaBrackets.appendChild(generate);
+                } else {
+                    areaBrackets.innerHTML += `<p class="text-stone-500 italic text-[11px] pl-2 py-2">Inicia el evento para generar automáticamente un bracket aleatorio.</p>`;
+                }
+                div.appendChild(areaBrackets);
+                return;
+            }
+
+            const rondasDisponibles = Object.keys(ev.bracketRondas);
+            
+            rondasDisponibles.forEach(rondaKey => {
+                const partidas = ev.bracketRondas[rondaKey] || [];
+                if (partidas.length === 0) return;
+
+                const seccionRonda = document.createElement('div');
+                seccionRonda.className = "bg-stone-950/60 p-3 rounded border border-stone-900 space-y-2";
+                seccionRonda.innerHTML = `<h6 class="font-bold text-red-400 tracking-wider uppercase font-oriental text-[11px] border-b border-stone-900 pb-1">💥 Llaves de: ${rondaKey}</h6>`;
+
+                const gridPartidas = document.createElement('div');
+                gridPartidas.className = "grid sm:grid-cols-2 gap-3 text-[11px]";
+
+                partidas.forEach((partida, pIdx) => {
+                    const cardPartida = document.createElement('div');
+                    cardPartida.className = "bg-black/80 p-2.5 rounded border border-stone-800 space-y-2 flex flex-col justify-between";
+
+                    const eq1Name = partida.equipo1 ? partida.equipo1 : '🥇 Por definir';
+                    const eq2Name = partida.equipo2 ? partida.equipo2 : '🥈 Por definir';
+
+                    let btnAcciones = '';
+                    if (partida.equipo1 && partida.equipo2 && !partida.ganador) {
+                        btnAcciones = `
+                            <div class="flex gap-1 mt-1 border-t border-stone-900 pt-2 justify-between items-center">
+                                <span class="text-[9px] text-stone-500 font-mono">Declarar Victoria:</span>
+                                <div class="flex gap-1">
+                                    <button onclick="declararGanadorBracket(${ev.id}, '${rondaKey}', ${pIdx}, 1)" class="bg-emerald-600 text-white font-bold px-2 py-0.5 rounded text-[10px] hover:bg-emerald-500 transition">Ganador Eq 1</button>
+                                    <button onclick="declararGanadorBracket(${ev.id}, '${rondaKey}', ${pIdx}, 2)" class="bg-indigo-600 text-white font-bold px-2 py-0.5 rounded text-[10px] hover:bg-indigo-500 transition">Ganador Eq 2</button>
+                                </div>
+                            </div>
+                        `;
+                    } else if (partida.ganador) {
+                        btnAcciones = `
+                            <div class="mt-1 border-t border-stone-900 pt-1 text-center font-bold text-amber-400 bg-amber-950/20 py-0.5 rounded text-[10px] uppercase font-mono">
+                                🎉 Avanza: ${sanitizarHTML(partida.ganador)}
+                            </div>
+                        `;
+                    }
+
+                    cardPartida.innerHTML = `
+                        <div class="space-y-1">
+                            <div class="flex justify-between items-center p-1.5 rounded ${partida.ganador === partida.equipo1 ? 'bg-emerald-950/30 text-emerald-400 font-bold border border-emerald-900' : 'bg-stone-900 text-stone-300'}">
+                                <span class="truncate">🛡️ ${sanitizarHTML(eq1Name)}</span>
+                            </div>
+                            <div class="text-center text-[9px] font-bold text-stone-600 font-mono">VS</div>
+                            <div class="flex justify-between items-center p-1.5 rounded ${partida.ganador === partida.equipo2 ? 'bg-indigo-950/30 text-indigo-400 font-bold border border-indigo-900' : 'bg-stone-900 text-stone-300'}">
+                                <span class="truncate">🛡️ ${sanitizarHTML(eq2Name)}</span>
+                            </div>
+                        </div>
+                        ${btnAcciones}
+                    `;
+                    gridPartidas.appendChild(cardPartida);
+                });
+
+                seccionRonda.appendChild(gridPartidas);
+                areaBrackets.appendChild(seccionRonda);
+            });
+
+            div.appendChild(areaBrackets);
+        }
+
+        function inicializarBracketEstructura(ev) {
+            const equipos = [...(ev.equipos || [])].map(team => team.nombre);
+            for (let index = equipos.length - 1; index > 0; index--) {
+                const swapIndex = Math.floor(Math.random() * (index + 1));
+                [equipos[index], equipos[swapIndex]] = [equipos[swapIndex], equipos[index]];
+            }
+            let slotCount = 1;
+            while (slotCount < equipos.length) slotCount *= 2;
+            const firstRoundMatchCount = slotCount / 2;
+            const roundNames = [];
+            for (let count = firstRoundMatchCount; count >= 1; count /= 2) {
+                roundNames.push(count === 1 ? 'Final'
+                    : count === 2 ? 'Semifinal'
+                        : count === 4 ? 'Cuartos'
+                            : count === 8 ? 'Octavos' : `Ronda de ${count * 2}`);
+            }
+            ev.bracketRondas = {};
+            roundNames.forEach((name, index) => {
+                const matchCount = firstRoundMatchCount / (2 ** index);
+                ev.bracketRondas[name] = Array.from({ length: matchCount }, () => ({
+                    equipo1: null, equipo2: null, ganador: null
+                }));
+            });
+            const firstRound = ev.bracketRondas[roundNames[0]];
+            const byeCount = slotCount - equipos.length;
+            firstRound.forEach((match, index) => {
+                if (index < byeCount) {
+                    match.equipo1 = equipos[index] || null;
+                    match.ganador = match.equipo1;
+                    const nextRound = ev.bracketRondas[roundNames[1]];
+                    if (nextRound) nextRound[Math.floor(index / 2)][index % 2 === 0 ? 'equipo1' : 'equipo2'] = match.ganador;
+                } else {
+                    const teamIndex = byeCount + (index - byeCount) * 2;
+                    match.equipo1 = equipos[teamIndex] || null;
+                    match.equipo2 = equipos[teamIndex + 1] || null;
+                }
+            });
+            ev.ordenSorteo = equipos;
+            ev.sorteoGeneradoAt = new Date().toISOString();
+        }
+
+        function esEventoEliminacion(ev) {
+            return /copa|bracket|eliminaci[oó]n|showdown/i.test(ev.tipo || '');
+        }
+
+        function generarSorteoAleatorio(eventoId) {
+            listaEventos = JSON.parse(localStorage.getItem('liga_bs_eventos')) || [];
+            const ev = listaEventos.find(event => event.id === eventoId);
+            if (!ev || ev.estado !== 'EN JUEGO') return;
+            if (Object.keys(ev.bracketRondas || {}).length || ev.ordenSorteo?.length) {
+                alert('Este evento ya tiene un sorteo generado. No se puede volver a sortear.');
+                return;
+            }
+            if (!confirm('El sorteo fija los emparejamientos y no debe repetirse después de jugar partidos. ¿Continuar?')) return;
+            const equipos = ev.equipos || [];
+            if (equipos.length < 2) {
+                alert('Se necesitan al menos 2 participantes para generar la clasificación.');
+                return;
+            }
+            if (esEventoEliminacion(ev)) {
+                inicializarBracketEstructura(ev);
+            } else {
+                ev.ordenSorteo = equipos.map(equipo => equipo.nombre);
+                for (let index = ev.ordenSorteo.length - 1; index > 0; index--) {
+                    const swapIndex = Math.floor(Math.random() * (index + 1));
+                    [ev.ordenSorteo[index], ev.ordenSorteo[swapIndex]] = [ev.ordenSorteo[swapIndex], ev.ordenSorteo[index]];
+                }
+                ev.sorteoGeneradoAt = new Date().toISOString();
+            }
+            localStorage.setItem('liga_bs_eventos', JSON.stringify(listaEventos));
+            publicarEstadoAdmin('events', listaEventos);
+            renderizarEventosAdmin();
+        }
+
+        function declararGanadorBracket(eventoId, rondaActual, partidaIdx, indexEquipoGanador) {
+            listaEventos = JSON.parse(localStorage.getItem('liga_bs_eventos')) || [];
+            const ev = listaEventos.find(e => e.id === eventoId);
+            if (!ev || !ev.bracketRondas) return;
+
+            const partida = ev.bracketRondas[rondaActual][partidaIdx];
+            const ganador = indexEquipoGanador === 1 ? partida.equipo1 : partida.equipo2;
+            
+            if (!ganador) return;
+            partida.ganador = ganador;
+
+            const rondas = Object.keys(ev.bracketRondas);
+            const indexRonda = rondas.indexOf(rondaActual);
+            const proximaRonda = rondas[indexRonda + 1];
+            if (proximaRonda) {
+                const proximoIdx = Math.floor(partidaIdx / 2);
+                if (!ev.bracketRondas[proximaRonda][proximoIdx]) {
+                    ev.bracketRondas[proximaRonda][proximoIdx] = { equipo1: null, equipo2: null, ganador: null };
+                }
+                if (partidaIdx % 2 === 0) {
+                    ev.bracketRondas[proximaRonda][proximoIdx].equipo1 = ganador;
+                } else {
+                    ev.bracketRondas[proximaRonda][proximoIdx].equipo2 = ganador;
+                }
+            }
+
+            localStorage.setItem('liga_bs_eventos', JSON.stringify(listaEventos));
+            publicarEstadoAdmin('events', listaEventos);
+            renderizarEventosAdmin();
+        }
+
+        function renderizarPropuestasTorneos() {
+            listaPropuestas = JSON.parse(localStorage.getItem('liga_bs_propuestas_torneos')) || [];
+            const contenedor = document.getElementById('contenedor-propuestas-torneos');
+            contenedor.innerHTML = "";
+
+            if (listaPropuestas.length === 0) {
+                contenedor.innerHTML = `<div class="text-stone-600 italic text-center py-2 animate-pulse">No hay solicitudes de torneos hechas por usuarios por el momento.</div>`;
+                return;
+            }
+
+            listaPropuestas.forEach((prop, idx) => {
+                const item = document.createElement('div');
+                item.className = "bg-stone-950 p-3 rounded border border-stone-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 hover:border-amber-500/40 transition animate-fade-in";
+                item.innerHTML = `
+                    <div>
+                        <h4 class="font-bold text-amber-500 font-oriental text-xs">${sanitizarHTML(prop.nombre)}</h4>
+                        <p class="text-[10px] text-stone-400 mt-0.5">Propuesto por: <span class="text-white">${sanitizarHTML(prop.organizador || prop.contacto)}</span> | Modalidad: ${sanitizarHTML(prop.tipo)}</p>
+                        <p class="text-[10px] text-stone-500 max-w-xl italic mt-1">"${sanitizarHTML(prop.detalles || prop.reglas || 'Sin descripción adicional')}"</p>
+                    </div>
+                    <div class="flex gap-2 flex-shrink-0 w-full sm:w-auto justify-end">
+                        <button onclick="procesarPropuesta(${idx}, true)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2 py-1 rounded text-[10px] active:scale-95 shadow transition">Aprobar</button>
+                        <button onclick="procesarPropuesta(${idx}, false)" class="bg-red-950 border border-red-900 text-red-400 hover:bg-red-900 hover:text-white font-bold px-2 py-1 rounded text-[10px] active:scale-95 transition">Rechazar</button>
+                    </div>
+                `;
+                contenedor.appendChild(item);
+            });
+        }
+
+        function renderizarBugsPrivados() {
+            listaBugs = JSON.parse(localStorage.getItem('liga_bs_bugs')) || [];
+            const tbody = document.getElementById('tabla-bugs-cuerpo');
+            tbody.innerHTML = "";
+            
+            if (listaBugs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-stone-600 italic">Sin incidentes pendientes en cola.</td></tr>`;
+                return;
+            }
+            
+            listaBugs.forEach(b => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-stone-900/60 border-b border-stone-900 transition duration-150 animate-fade-in";
+                tr.innerHTML = `
+                    <td class="p-2 font-mono text-red-500">${sanitizarHTML(b.idBug || 'TK')}</td>
+                    <td class="p-2 text-stone-300 font-semibold uppercase">${sanitizarHTML(b.origen || b.tipoReporte)}</td>
+                    <td class="p-2 text-stone-400">
+                        <div class="max-w-md break-words">${sanitizarHTML(b.descripcion)}</div>
+                        <span class="text-[9px] text-stone-600 block mt-0.5">${sanitizarHTML(b.fechaHora)}</span>
+                    </td>
+                    <td class="p-2 text-amber-500 font-semibold">${sanitizarHTML(b.reportadoPor)} <span class="text-[10px] text-stone-500 block font-normal">${sanitizarHTML(b.contacto)}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function editarParametrosTorneo(eventoId) {
+            listaEventos = JSON.parse(localStorage.getItem('liga_bs_eventos')) || [];
+            const ev = listaEventos.find(e => e.id === eventoId);
+            if (!ev) return;
+
+            const nuevoNombre = prompt("Nombre del Torneo:", ev.nombre);
+            if (!nuevoNombre) return;
+
+            const nuevosPremios = prompt("Premios (Bolsa):", ev.premios);
+            const nuevasReglas = prompt("Reglamento General:", ev.reglas);
+            const nuevoLimite = prompt("Límite Máximo de Equipos:", ev.limite);
+
+            ev.nombre = nuevoNombre.trim();
+            if (nuevosPremios) ev.premios = nuevosPremios.trim();
+            if (nuevasReglas) ev.reglas = nuevasReglas.trim();
+            if (nuevoLimite) ev.limite = parseInt(nuevoLimite) || ev.limite;
+
+            if (confirm("🖼️ ¿Deseas actualizar o cambiar el Banner / Imagen de este torneo?")) {
+                const inputArchivoOculto = document.createElement('input');
+                inputArchivoOculto.type = 'file';
+                inputArchivoOculto.accept = 'image/*';
+                inputArchivoOculto.addEventListener('change', async (event) => {
+                    const file = event.target.files[0];
+                    if (file) {
+                        try {
+                            const base64Str = await archivoABase64(file);
+                            ev.banner = base64Str;
+                            localStorage.setItem('liga_bs_eventos', JSON.stringify(listaEventos));
+                            publicarEstadoAdmin('events', listaEventos);
+                            renderizarEventosAdmin();
+                            alert("✅ Banner del torneo actualizado con éxito.");
+                        } catch (err) {
+                            console.error("Error actualizando el banner:", err);
+                            alert(`❌ ${err.message || 'No se pudo actualizar el banner.'}`);
+                        }
+                    }
+                });
+                inputArchivoOculto.click();
+            } else {
+                localStorage.setItem('liga_bs_eventos', JSON.stringify(listaEventos));
+                publicarEstadoAdmin('events', listaEventos);
+                renderizarEventosAdmin();
+            }
+        }
+
+        function agregarJugadorFuerza(eventoId, indexEquipo) {
+            listaEventos = JSON.parse(localStorage.getItem('liga_bs_eventos')) || [];
+            const ev = listaEventos.find(e => e.id === eventoId);
+            if (!ev || !ev.equipos[indexEquipo]) return;
+            const eq = ev.equipos[indexEquipo];
+            let slotDisponible = "";
+            if (!eq.j1) slotDisponible = "j1";
+            else if (!eq.j2) slotDisponible = "j2";
+            else if (!eq.j3) slotDisponible = "j3";
+            else if (!eq.j4) slotDisponible = "j4";
+            if (!slotDisponible) { alert("❌ El club se encuentra lleno."); return; }
+            const nick = prompt("Introduce el Nickname / Tag del nuevo jugador:");
+            if (nick && nick.trim() !== "") {
+                eq[slotDisponible] = nick.trim();
+                localStorage.setItem('liga_bs_eventos', JSON.stringify(listaEventos));
+                publicarEstadoAdmin('events', listaEventos);
+                renderizarEventosAdmin();
+            }
+        }
+
+        async function subirImagenEquipoArchivo(event, eventoId, indexEquipo) {
+            const file = event.target.files[0];
+            if (!file) return;
+            try {
+                const base64Str = await archivoABase64(file);
+                listaEventos = JSON.parse(localStorage.getItem('liga_bs_eventos')) || [];
+                const ev = listaEventos.find(e => e.id === eventoId);
+                if (ev && ev.equipos[indexEquipo]) {
+                    ev.equipos[indexEquipo].logo = base64Str;
+                    localStorage.setItem('liga_bs_eventos', JSON.stringify(listaEventos));
+                    await persistirEstadoAdmin('events', listaEventos);
+                    renderizarEventosAdmin();
+                }
+            } catch (err) {
+                console.error("Error cargando la imagen del equipo:", err);
+                alert(`❌ ${err.message || 'No se pudo cargar la imagen del equipo.'}`);
+            }
+        }
+
+        function procesarPropuesta(index, aprobado) {
+            listaPropuestas = JSON.parse(localStorage.getItem('liga_bs_propuestas_torneos')) || [];
+            if (aprobado && listaPropuestas[index]) {
+                const prop = listaPropuestas[index];
+                listaEventos = JSON.parse(localStorage.getItem('liga_bs_eventos')) || [];
+                listaEventos.push({
+                    id: Date.now(), nombre: prop.nombre, tipo: prop.tipo || 'Torneo 1v1 Showdown (Brackets)',
+                    banner: prop.banner || '', fecha: prop.fecha || new Date().toISOString().split('T')[0],
+                    hora: prop.hora || '19:00', limite: parseInt(prop.limite) || 16, contacto: prop.contacto || 'Comunidad',
+                    premios: prop.premios || 'Por definir', reglas: prop.reglas || 'Reglas estándar de Cyber Win',
+                    estado: 'INSCRIPCIONES ABIERTAS', equipos: [], bracketRondas: {}
+                });
+                localStorage.setItem('liga_bs_eventos', JSON.stringify(listaEventos));
+                publicarEstadoAdmin('events', listaEventos);
+            }
+            listaPropuestas.splice(index, 1);
+            localStorage.setItem('liga_bs_propuestas_torneos', JSON.stringify(listaPropuestas));
+            publicarEstadoAdmin('proposals', listaPropuestas);
+            renderizarEventosAdmin();
+            renderizarPropuestasTorneos();
+        }
+
+        function editarNombreClub(eventoId, indexEquipo, nombreActual) {
+            const nuevoNombre = prompt("Modificar nombre del equipo:", nombreActual);
+            if (nuevoNombre && nuevoNombre.trim() !== "") {
+                listaEventos = JSON.parse(localStorage.getItem('liga_bs_eventos')) || [];
+                const ev = listaEventos.find(e => e.id === eventoId);
+                if (ev && ev.equipos[indexEquipo]) {
+                    ev.equipos[indexEquipo].nombre = nuevoNombre.trim();
+                    localStorage.setItem('liga_bs_eventos', JSON.stringify(listaEventos));
+                    publicarEstadoAdmin('events', listaEventos);
+                    renderizarEventosAdmin();
+                }
+            }
+        }
+
+        function descalificarClubCompleto(eventoId, indexEquipo) {
+            if (confirm("⚠️ ¿Confirmas la descalificación?")) {
+                listaEventos = JSON.parse(localStorage.getItem('liga_bs_eventos')) || [];
+                const ev = listaEventos.find(e => e.id === eventoId);
+                if (ev && ev.equipos) {
+                    ev.equipos.splice(indexEquipo, 1);
+                    localStorage.setItem('liga_bs_eventos', JSON.stringify(listaEventos));
+                    publicarEstadoAdmin('events', listaEventos);
+                    renderizarEventosAdmin();
+                }
+            }
+        }
+
+        function expulsarJugadorSlot(eventoId, indexEquipo, slotKey) {
+            listaEventos = JSON.parse(localStorage.getItem('liga_bs_eventos')) || [];
+            const ev = listaEventos.find(e => e.id === eventoId);
+            if (ev && ev.equipos[indexEquipo] && confirm("¿Eliminar jugador de la alineación?")) {
+                ev.equipos[indexEquipo][slotKey] = ""; 
+                localStorage.setItem('liga_bs_eventos', JSON.stringify(listaEventos));
+                publicarEstadoAdmin('events', listaEventos);
+                renderizarEventosAdmin();
+            }
+        }
+
+        function eliminarImagenEquipo(eventoId, indexEquipo) {
+            listaEventos = JSON.parse(localStorage.getItem('liga_bs_eventos')) || [];
+            const ev = listaEventos.find(e => e.id === eventoId);
+            if (ev && ev.equipos[indexEquipo] && confirm("¿Remover logo?")) {
+                delete ev.equipos[indexEquipo].logo;
+                localStorage.setItem('liga_bs_eventos', JSON.stringify(listaEventos));
+                publicarEstadoAdmin('events', listaEventos);
+                renderizarEventosAdmin();
+            }
+        }
+
+        function cambiarEstadoEvento(id, nuevoEstado) {
+            listaEventos = JSON.parse(localStorage.getItem('liga_bs_eventos')) || [];
+            const ev = listaEventos.find(e => e.id === id);
+            if (ev) {
+                if (nuevoEstado === 'EN JUEGO' && ev.estado !== 'EN JUEGO') {
+                    if ((ev.equipos || []).length < 2) {
+                        alert('Se necesitan al menos 2 participantes para iniciar y generar el sorteo.');
+                        renderizarEventosAdmin();
+                        return;
+                    }
+                    if (!confirm('Al iniciar se generará un sorteo aleatorio de emparejamientos/posiciones. ¿Empezar el evento?')) {
+                        renderizarEventosAdmin();
+                        return;
+                    }
+                    ev.estado = nuevoEstado;
+                    if (esEventoEliminacion(ev) && !Object.keys(ev.bracketRondas || {}).length) {
+                        inicializarBracketEstructura(ev);
+                    } else if (!esEventoEliminacion(ev) && !ev.ordenSorteo?.length) {
+                        ev.ordenSorteo = ev.equipos.map(equipo => equipo.nombre);
+                        for (let index = ev.ordenSorteo.length - 1; index > 0; index--) {
+                            const swapIndex = Math.floor(Math.random() * (index + 1));
+                            [ev.ordenSorteo[index], ev.ordenSorteo[swapIndex]] = [ev.ordenSorteo[swapIndex], ev.ordenSorteo[index]];
+                        }
+                        ev.sorteoGeneradoAt = new Date().toISOString();
+                    }
+                } else {
+                ev.estado = nuevoEstado;
+                }
+                localStorage.setItem('liga_bs_eventos', JSON.stringify(listaEventos));
+                publicarEstadoAdmin('events', listaEventos);
+                renderizarEventosAdmin();
+            }
+        }
+
+        function actualizarPuntosClub(eventoId, nombreClub, nuevosPuntos) {
+            listaEventos = JSON.parse(localStorage.getItem('liga_bs_eventos')) || [];
+            const ev = listaEventos.find(e => e.id === eventoId);
+            if (ev && ev.equipos) {
+                const eq = ev.equipos.find(x => x.nombre === nombreClub);
+                if (eq) {
+                    eq.puntos = nuevosPuntos;
+                    localStorage.setItem('liga_bs_eventos', JSON.stringify(listaEventos));
+                    publicarEstadoAdmin('events', listaEventos);
+                }
+            }
+        }
+
+        function borrarEventoDefinitivo(id) {
+            if (confirm("🚨 ¿Borrar torneo definitivamente?")) {
+                listaEventos = listaEventos.filter(e => e.id !== id);
+                localStorage.setItem('liga_bs_eventos', JSON.stringify(listaEventos));
+                publicarEstadoAdmin('events', listaEventos);
+                renderizarEventosAdmin();
+            }
+        }
+
+        function limpiarTodosLosTickets() {
+            if (confirm("¿Limpiar historial completo?")) {
+                persistirEstadoAdmin('bugs', []).then(() => {
+                    localStorage.setItem('liga_bs_bugs', '[]');
+                    listaBugs = [];
+                    renderizarBugsPrivados();
+                }).catch(error => alert(`❌ No se pudieron eliminar los reportes: ${error.message}`));
+            }
+        }
+
+        function imprimirResultadosEvento(idEvento) {
+            listaEventos = JSON.parse(localStorage.getItem('liga_bs_eventos')) || [];
+            const ev = listaEventos.find(e => e.id === idEvento);
+            if (!ev) return;
+            const areaPrint = document.getElementById('area-impresion-exclusiva');
+            
+            let contenido = `<div style="font-family: Arial; color: black;"><h1 style="text-align: center;">CYBER WIN</h1><h2 style="text-align: center;">REPORTE DE LOGÍSTICA / RESULTADOS</h2><hr><p><strong>EVENTO:</strong> ${sanitizarHTML(ev.nombre)}</p><p><strong>TIPO:</strong> ${sanitizarHTML(ev.tipo)}</p>`;
+            
+            if (ev.tipo && ev.tipo.includes("Copa 3v3")) {
+                contenido += `<h3>LLAVES DEL TORNEO (BRACKETS)</h3>`;
+                const rondas = ['Octavos', 'Cuartos', 'Semifinal', 'Final'];
+                rondas.forEach(r => {
+                    const lasPartidas = ev.bracketRondas ? ev.bracketRondas[r] : [];
+                    if(lasPartidas && lasPartidas.length > 0) {
+                        contenido += `<div class="print-bracket"><strong>Ronda: ${r}</strong><br>`;
+                        lasPartidas.forEach((p, idx) => {
+                            contenido += `Enfrentamiento #${idx+1}: ${p.equipo1 || 'Vacante'} VS ${p.equipo2 || 'Vacante'} | Ganador: ${p.ganador || 'Pendiente'}<br>`;
+                        });
+                        contenido += `</div>`;
+                    }
+                });
+            } else {
+                const listaEquipos = ev.equipos || [];
+                contenido += `<table class="print-table"><thead><tr><th>POS</th><th>CLUB</th><th>PUNTOS</th></tr></thead><tbody>`;
+                if (listaEquipos.length === 0) { contenido += `<tr><td colspan="3" style="text-align: center;">Sin registros.</td></tr>`; } else { [...listaEquipos].sort((a,b)=>(b.puntos||0)-(a.puntos||0)).forEach((eq,idx)=>{ contenido += `<tr><td>#${idx+1}</td><td><strong>${sanitizarHTML(eq.nombre)}</strong></td><td>${eq.puntos||0} PTS</td></tr>`; }); }
+                contenido += `</tbody></table>`;
+            }
+            
+            contenido += `</div>`;
+            areaPrint.innerHTML = contenido; window.print();
+        }
+    </script>
+    <script src="/firebase-config.js"></script>
+    <script type="module" src="/firebase-auth.js"></script>
+</body>
+</html>

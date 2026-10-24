@@ -1,0 +1,1889 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Win | Torneos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mux/mux-player"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+        .font-oriental { font-family: 'Space Grotesk', sans-serif; }
+        .font-sans { font-family: 'DM Sans', sans-serif; }
+        
+        /* Fondo oficial de Cyber Win */
+        .brawl-bg { 
+            background: linear-gradient(to bottom, rgba(0,0,0,0.85), rgba(20,4,4,0.95)), 
+                        url('fondo-brawl.png') no-repeat center center fixed; 
+            background-size: cover;
+        }
+
+        /* --- ANIMACIONES --- */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); filter: blur(4px); }
+            to { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
+
+        @keyframes pulseBorder {
+            0%, 100% { border-color: rgba(220, 38, 38, 0.4); box-shadow: 0 0 12px rgba(220, 38, 38, 0.1); }
+            50% { border-color: rgba(239, 68, 68, 0.8); box-shadow: 0 0 24px rgba(239, 68, 68, 0.4); }
+        }
+
+        .animate-fade-up { animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .pulse-card { animation: pulseBorder 4s infinite ease-in-out; }
+
+        button, input, select, .event-card, .tab-btn {
+            transition: all 0.23s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .user-nav-link[aria-current="page"] { background: var(--custom-accent, #dc2626); color: white; box-shadow: 0 8px 24px color-mix(in srgb, var(--custom-accent, #dc2626) 28%, transparent); }
+        [data-user-view].hidden { display: none !important; }
+        .chat-message { max-width: min(85%, 38rem); overflow-wrap: anywhere; }
+        .assistant-mascot {
+            position: relative; display: grid; place-items: center; flex: 0 0 auto;
+            width: 42px; height: 46px; border: 2px solid #67e8f9; border-radius: 14px 14px 12px 12px;
+            background: linear-gradient(145deg, #164e63, #0891b2 55%, #155e75);
+            box-shadow: 0 0 12px #22d3ee, inset 0 0 12px rgba(255,255,255,.25);
+            animation: assistantFloat 2.8s ease-in-out infinite;
+        }
+        .assistant-mascot__antenna { position: absolute; width: 3px; height: 9px; background: #67e8f9; top: -9px; }
+        .assistant-mascot__antenna::after { content: ''; position: absolute; width: 7px; height: 7px; border-radius: 50%; background: #fbbf24; top: -5px; left: -2px; box-shadow: 0 0 8px #fbbf24; }
+        .assistant-mascot__visor { display: flex; align-items: center; justify-content: center; gap: 6px; width: 32px; height: 16px; border-radius: 8px; background: #082f49; box-shadow: inset 0 0 7px #38bdf8; }
+        .assistant-mascot__visor i { width: 5px; height: 5px; border-radius: 50%; background: #a5f3fc; box-shadow: 0 0 6px #67e8f9; }
+        .assistant-mascot__mouth { position: absolute; bottom: 7px; width: 10px; height: 3px; border-radius: 4px; background: #a5f3fc; }
+        .assistant-glow { box-shadow: 0 0 26px rgba(34,211,238,.18), 0 0 58px rgba(8,145,178,.12); }
+        @keyframes assistantFloat { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-4px) rotate(2deg); } }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+        }
+
+        body[data-theme] { --theme-accent: #dc2626; --theme-panel: rgba(28, 25, 23, .94); }
+        body[data-theme] .pulse-card { border-color: var(--theme-accent); }
+        body[data-theme] [class~="bg-red-600"], body[data-theme] [class~="hover:bg-red-700"]:hover { background-color: var(--theme-accent) !important; }
+        body[data-theme] [class~="text-red-400"], body[data-theme] [class~="text-red-500"], body[data-theme] [class~="text-amber-500"] { color: var(--theme-accent) !important; }
+        body[data-theme] [class~="border-red-600"], body[data-theme] [class~="hover:border-red-600"]:hover { border-color: var(--theme-accent) !important; }
+        body[data-theme] .event-card:hover { border-color: var(--theme-accent); }
+        body[data-theme="ocean"] { --theme-accent: #0891b2; }
+        body[data-theme="forest"] { --theme-accent: #16a34a; }
+        body[data-theme="violet"] { --theme-accent: #9333ea; }
+        body[data-theme="rose"] { --theme-accent: #e11d48; }
+        body[data-theme="gold"] { --theme-accent: #d97706; }
+        body[data-theme="cyber"] { --theme-accent: #06b6d4; }
+        body[data-theme="arctic"] { --theme-accent: #38bdf8; }
+        body[data-theme="sunset"] { --theme-accent: #f97316; }
+        body[data-theme="mono"] { --theme-accent: #a1a1aa; }
+        body[data-theme] [class~="bg-red-600"], body[data-theme] [class~="hover:bg-red-700"]:hover { background-color: var(--custom-accent, var(--theme-accent)) !important; }
+        body[data-theme] [class~="text-red-400"], body[data-theme] [class~="text-red-500"], body[data-theme] [class~="text-amber-500"] { color: var(--custom-accent, var(--theme-accent)) !important; }
+        body[data-theme] [class~="border-red-600"], body[data-theme] [class~="hover:border-red-600"]:hover { border-color: var(--custom-accent, var(--theme-accent)) !important; }
+        body[data-theme="cyber"] { background-image: radial-gradient(ellipse at 10% 0%, rgba(6,182,212,.2), transparent 40%), linear-gradient(135deg,#020617,#0f172a 55%,#111827); }
+        body[data-theme="arctic"] { background-image: radial-gradient(ellipse at 85% 0%, rgba(56,189,248,.2), transparent 40%), linear-gradient(135deg,#020617,#0c1a2a 55%,#172554); }
+        body[data-theme="sunset"] { background-image: radial-gradient(ellipse at 80% 0%, rgba(249,115,22,.2), transparent 40%), linear-gradient(135deg,#1c0a0a,#431407 55%,#1c1917); }
+        body[data-theme="mono"] { filter: saturate(.25); }
+    </style>
+</head>
+<body class="brawl-bg text-stone-100 font-sans min-h-screen antialiased selection:bg-red-600 selection:text-white">
+
+    <!-- 📢 BARRA DE NOTICIAS GLOBALES -->
+    <div id="barra-publicidad-global" class="bg-gradient-to-r from-red-950 via-red-900 to-stone-950 text-white py-2 px-4 text-center text-xs font-bold tracking-wide border-b border-red-700/50 hidden">
+        <span id="texto-publicidad-dinamico"></span>
+    </div>
+
+    <!-- 🗺️ NAVEGACIÓN -->
+    <nav class="bg-black/80 backdrop-blur-md border-b border-stone-900 sticky top-0 z-50 px-4 py-3">
+        <div class="max-w-6xl mx-auto flex flex-wrap justify-between items-center gap-2">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="volverAlInicio()">
+                <span class="text-xl">⚜️</span>
+                <span class="font-oriental font-bold tracking-widest text-sm md:text-base bg-gradient-to-r from-white to-stone-400 bg-clip-text text-transparent">Cyber Win</span>
+            </div>
+            
+            <div class="flex flex-wrap items-center justify-end gap-2 max-w-full">
+                <label for="selector-tema-usuario" class="sr-only">Tema de Cyber Win</label>
+                <select id="selector-tema-usuario" onchange="cambiarTema(this.value)" class="bg-black/70 border border-stone-800 text-stone-300 rounded px-2 py-1 text-[10px]" aria-label="Tema visual">
+                    <option value="red">Rojo neón</option><option value="ocean">Océano</option><option value="forest">Bosque</option><option value="violet">Violeta</option><option value="rose">Rosa</option><option value="gold">Oro</option><option value="cyber">Cyber</option><option value="arctic">Ártico</option><option value="sunset">Atardecer</option><option value="mono">Monocromo</option>
+                </select>
+                <button onclick="aplicarTemaAleatorio()" class="bg-stone-900 border border-stone-800 text-stone-300 px-2 py-1 rounded text-[10px]" type="button">🎲 Aleatorio</button>
+                <div id="status-usuario-nav" class="text-xs flex items-center gap-3">
+                <!-- Se inyecta dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 🏠 CONTENEDOR PRINCIPAL -->
+    <main class="max-w-6xl mx-auto p-4 md:p-6 space-y-8 min-h-[calc(100vh-120px)] flex flex-col justify-between">
+        
+        <!-- VISTA DE AUTENTICACIÓN CONTROLADA (OBLIGATORIA) -->
+        <section id="vista-login" class="flex flex-col items-center justify-center flex-grow py-12 hidden">
+            <div id="bloque-identificacion" class="w-full max-w-md bg-stone-900/95 p-8 rounded-lg border pulse-card backdrop-blur-md space-y-6">
+                <div class="text-center space-y-1">
+                    <span class="text-3xl">🔓</span>
+                    <h2 class="font-oriental text-xl tracking-wider text-amber-500">Iniciar sesión con correo</h2>
+                    <p class="text-xs text-stone-400">Usa tu correo para recuperar el perfil guardado o crea uno con tu Player Tag oficial.</p>
+                    <p class="text-[10px] text-stone-500">Firebase gestiona tu contraseña. El correo no se verifica; el perfil se sincroniza con Cyber Win.</p>
+                </div>
+                
+                <form id="user-auth-form" class="space-y-4 text-xs">
+                    <div>
+                        <label class="block text-stone-400 font-bold mb-1.5 uppercase text-[10px]">Correo electrónico *</label>
+                        <input type="email" id="user-email" required autocomplete="email" maxlength="254" placeholder="tu@correo.com" class="w-full p-3 bg-black border border-stone-800 rounded text-white focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600">
+                    </div>
+                    <div>
+                        <label class="block text-stone-400 font-bold mb-1.5 uppercase text-[10px]">Tu Nickname In-Game *</label>
+                        <input type="text" id="user-nick" maxlength="20" placeholder="Ej: KomiNacatamal (solo al crear cuenta)" class="w-full p-3 bg-black border border-stone-800 rounded text-white focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600">
+                    </div>
+                    <div>
+                        <label class="block text-stone-400 font-bold mb-1.5 uppercase text-[10px]">Player Tag Oficial (#) *</label>
+                        <input type="text" id="user-tag" placeholder="Ej: #2G9R0YCP (solo al crear cuenta)" class="w-full p-3 bg-black border border-stone-800 rounded text-white focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 font-mono tracking-widest uppercase">
+                    </div>
+                    <div>
+                        <label class="block text-stone-400 font-bold mb-1.5 uppercase text-[10px]">Contraseña (mínimo 8 caracteres) *</label>
+                        <input type="password" id="user-password" required autocomplete="current-password" class="w-full p-3 bg-black border border-stone-800 rounded text-white focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button type="submit" data-auth-mode="login" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded uppercase tracking-wide">Iniciar sesión</button>
+                        <button type="submit" data-auth-mode="register" class="bg-stone-700 hover:bg-stone-600 text-white font-bold py-3 rounded uppercase tracking-wide">Crear cuenta</button>
+                    </div>
+                    <button id="password-reset" type="button" class="w-full text-stone-400 hover:text-white underline text-[10px]">Olvidé mi contraseña</button>
+                    <p id="user-auth-message" role="status" aria-live="polite" class="text-[11px] min-h-4"></p>
+                </form>
+            </div>
+        </section>
+
+        <!-- VISTA 1: CONTENIDO DEL LOGUEADO (INICIO / EVENTOS) -->
+        <section id="vista-inicio" class="space-y-8 animate-fade-up hidden">
+            <div class="grid lg:grid-cols-[220px_minmax(0,1fr)] gap-5 lg:gap-7 items-start">
+            <aside class="min-w-0 lg:sticky lg:top-24 z-40 bg-black/85 backdrop-blur-md p-2 lg:p-3 rounded-xl border border-stone-800" aria-label="Navegación de usuarios">
+                <div class="hidden lg:flex items-center gap-3 p-3 mb-2 border-b border-stone-800">
+                    <img id="user-nav-avatar" alt="" class="w-11 h-11 rounded-full object-cover border border-stone-700 bg-stone-900 hidden">
+                    <span id="user-nav-avatar-fallback" class="w-11 h-11 grid place-items-center rounded-full bg-stone-800 text-xl">👤</span>
+                    <div class="min-w-0"><p id="user-nav-name" class="text-sm font-bold text-white truncate"></p><p class="text-[10px] text-stone-500">Comunidad Cyber Win</p></div>
+                </div>
+                <nav class="flex lg:flex-col gap-1 overflow-x-auto" aria-label="Secciones de usuarios">
+                    <button type="button" data-user-nav="seccion-eventos" onclick="irASeccionUsuario('seccion-eventos')" aria-current="page" class="user-nav-link flex-none lg:w-full text-left px-3 py-2.5 rounded-lg text-xs font-semibold whitespace-nowrap">🏆 <span class="ml-1">Torneos</span></button>
+                    <button type="button" data-user-nav="seccion-avisos" onclick="irASeccionUsuario('seccion-avisos')" class="user-nav-link flex-none lg:w-full text-left px-3 py-2.5 rounded-lg text-xs font-semibold text-stone-300 hover:bg-stone-800 whitespace-nowrap">📢 <span class="ml-1">Avisos</span></button>
+                    <button type="button" data-user-nav="seccion-creadores" onclick="irASeccionUsuario('seccion-creadores')" class="user-nav-link flex-none lg:w-full text-left px-3 py-2.5 rounded-lg text-xs font-semibold text-stone-300 hover:bg-stone-800 whitespace-nowrap">🔴 <span class="ml-1">Streamings</span></button>
+                    <button type="button" data-user-nav="seccion-social" onclick="irASeccionUsuario('seccion-social')" class="user-nav-link flex-none lg:w-full text-left px-3 py-2.5 rounded-lg text-xs font-semibold text-stone-300 hover:bg-stone-800 whitespace-nowrap">💬 <span class="ml-1">Amigos y chat</span></button>
+                    <button type="button" id="user-stream-nav" data-user-nav="panel-stream-creador" onclick="irASeccionUsuario('panel-stream-creador')" class="hidden user-nav-link flex-none lg:w-full text-left px-3 py-2.5 rounded-lg text-xs font-semibold text-stone-300 hover:bg-stone-800 whitespace-nowrap">🎥 <span class="ml-1">Mi streaming</span></button>
+                    <button type="button" data-user-nav="panel-cuenta-usuario" onclick="abrirCuentaUsuario()" class="user-nav-link flex-none lg:w-full text-left px-3 py-2.5 rounded-lg text-xs font-semibold text-stone-300 hover:bg-stone-800 whitespace-nowrap">👤 <span class="ml-1">Mi perfil</span></button>
+                </nav>
+            </aside>
+            <div class="min-w-0 space-y-8">
+
+            <section id="panel-cuenta-usuario" data-user-view class="hidden bg-stone-900/95 p-5 rounded-lg border border-stone-800 space-y-4 animate-fade-up">
+                <div>
+                    <h3 class="font-oriental font-bold text-white text-base">Personalización de cuenta</h3>
+                    <p class="text-[10px] text-stone-500">Personaliza tu nickname, avatar, banner y apariencia.</p>
+                </div>
+                <div id="profile-banner-preview" class="relative h-36 sm:h-44 mb-10 rounded-xl bg-cover bg-center border border-stone-800 overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/75 to-transparent"></div>
+                    <img id="profile-avatar-preview" alt="Vista previa de foto de perfil" class="absolute left-5 -bottom-1 translate-y-1/2 w-20 h-20 rounded-full object-cover border-4 border-stone-900 bg-stone-800">
+                </div>
+                <form id="account-form" class="grid md:grid-cols-2 gap-3 text-xs">
+                    <div>
+                        <label for="account-nickname" class="block text-stone-400 font-bold mb-1">Nickname público</label>
+                        <input id="account-nickname" required maxlength="20" minlength="2" class="w-full p-2 bg-black border border-stone-800 rounded text-white">
+                    </div>
+                    <div>
+                        <label for="account-tag" class="block text-stone-400 font-bold mb-1">Player Tag</label>
+                        <input id="account-tag" required maxlength="11" pattern="#?[0-9A-Za-z]{3,10}" class="w-full p-2 bg-black border border-stone-800 rounded text-white font-mono uppercase">
+                    </div>
+                    <div>
+                        <label for="account-theme" class="block text-stone-400 font-bold mb-1">Tema</label>
+                        <select id="account-theme" class="w-full p-2 bg-black border border-stone-800 rounded text-white">
+                            <option value="red">Rojo neón</option><option value="ocean">Océano</option><option value="forest">Bosque</option><option value="violet">Violeta</option><option value="rose">Rosa</option><option value="gold">Oro</option><option value="cyber">Cyber</option><option value="arctic">Ártico</option><option value="sunset">Atardecer</option><option value="mono">Monocromo</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="account-accent" class="block text-stone-400 font-bold mb-1">Color de acento</label>
+                        <input id="account-accent" type="color" value="#dc2626" class="h-9 w-full bg-black border border-stone-800 rounded p-1">
+                    </div>
+                    <div>
+                        <label for="account-banner-color" class="block text-stone-400 font-bold mb-1">Color del banner</label>
+                        <input id="account-banner-color" type="color" value="#1c1917" class="h-9 w-full bg-black border border-stone-800 rounded p-1">
+                    </div>
+                    <div>
+                        <label for="account-avatar-file" class="block text-stone-400 font-bold mb-1">Foto de perfil (JPEG, PNG o WebP; hasta 300 KB)</label>
+                        <input id="account-avatar-file" type="file" accept="image/jpeg,image/png,image/webp" class="w-full p-2 bg-black border border-stone-800 rounded text-stone-300 text-[10px]">
+                    </div>
+                    <div>
+                        <label for="account-banner-file" class="block text-stone-400 font-bold mb-1">Foto de banner (JPEG, PNG o WebP; hasta 700 KB)</label>
+                        <input id="account-banner-file" type="file" accept="image/jpeg,image/png,image/webp" class="w-full p-2 bg-black border border-stone-800 rounded text-stone-300 text-[10px]">
+                    </div>
+                    <p id="account-message" role="status" aria-live="polite" class="md:col-span-2 min-h-4 text-[11px]"></p>
+                    <button type="submit" class="md:col-span-2 bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded">Guardar perfil y apariencia</button>
+                </form>
+                <button type="button" onclick="cerrarPanelCuenta()" class="text-stone-400 underline text-[10px]">Volver a torneos</button>
+            </section>
+            
+            <!-- GRILLA DE EVENTOS COMPARTIDOS -->
+            <div id="seccion-eventos" data-user-view class="space-y-4 animate-fade-up">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-stone-900 pb-2 gap-2">
+                    <div>
+                        <h3 class="font-oriental font-bold text-lg tracking-wide">📢 CARTELERA DE TORNEOS ACTIVOS</h3>
+                        <p class="text-[11px] text-stone-500">Selecciona un torneo oficial para revisar clasificaciones o inscribirte</p>
+                    </div>
+                    <button id="btn-propone-torneo" onclick="abrirModalPropuesta()" class="hidden bg-stone-900 border border-amber-500/40 text-amber-500 font-bold text-xs px-4 py-2 rounded uppercase tracking-wide hover:bg-amber-500 hover:text-black active:scale-95 shadow-md">💡 Proponer Evento</button>
+                </div>
+
+                <div id="contenedor-eventos-publicos" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Eventos vía JS -->
+                </div>
+            </div>
+
+            <section id="seccion-avisos" data-user-view class="hidden bg-stone-900/50 p-5 rounded-lg border border-stone-900 space-y-3 animate-fade-up">
+                <div>
+                    <span class="text-xs font-bold text-amber-500 uppercase tracking-wider font-mono">CENTRO DE AVISOS</span>
+                    <h4 class="text-base font-bold text-white font-oriental mt-1">NOVEDADES DE CYBER WIN</h4>
+                </div>
+                <div id="contenedor-avisos-publicos" class="grid md:grid-cols-2 gap-3" aria-live="polite"></div>
+            </section>
+
+            <!-- SECCIÓN EXTRA: COMUNIDAD & CREADORES -->
+            <div id="seccion-creadores" data-user-view class="hidden grid md:grid-cols-2 gap-6 pt-4 animate-fade-up">
+                <!-- Servidor Oficial -->
+                <div class="bg-stone-900/40 p-5 rounded-lg border border-stone-900 space-y-3 flex flex-col justify-between">
+                    <div>
+                        <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider font-mono">COMUNIDAD DISCORD</span>
+                        <h4 class="text-base font-bold text-white font-oriental mt-1">ÚNETE A LA COMUNIDAD CYBER WIN</h4>
+                        <p class="text-xs text-stone-400 mt-1 leading-relaxed">Es un requisito obligatorio estar dentro del servidor para coordinar partidas, apelaciones de llaves y reclamo de premios en efectivo.</p>
+                    </div>
+                    <a id="enlace-discord-dinamico" href="#" target="_blank" class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-center py-2 rounded text-xs uppercase tracking-wider shadow-md active:scale-95 mt-2">Ingresar al Servidor</a>
+                </div>
+
+                <!-- Creadores Afiliados -->
+                <div class="bg-stone-900/40 p-5 rounded-lg border border-stone-900 space-y-3">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <span class="text-xs font-bold text-red-400 uppercase tracking-wider font-mono">CREADORES OFICIALES</span>
+                            <h4 class="text-base font-bold text-white font-oriental mt-0.5">CANALES Y STREAMING EN VIVO</h4>
+                        </div>
+                        <button onclick="postularComoCreador()" class="bg-black/60 border border-stone-800 text-[10px] text-stone-300 font-bold px-2 py-1 rounded hover:border-red-600 transition">Postularme</button>
+                    </div>
+                    <div id="lista-creadores-publica" class="grid sm:grid-cols-2 gap-3 text-xs">
+                        <!-- Inyección JS -->
+                    </div>
+                    <section class="col-span-full bg-stone-900/50 p-5 rounded-xl border border-stone-800 space-y-4">
+                        <div>
+                            <span class="text-xs font-bold text-red-400 uppercase tracking-wider">RETRANSMISIONES DE LA COMUNIDAD</span>
+                            <h3 class="font-oriental text-lg font-bold text-white mt-1">En vivo desde Cyber Win</h3>
+                        </div>
+                        <div id="live-stream-list" class="grid md:grid-cols-2 gap-4" aria-live="polite"></div>
+                    </section>
+                    <section class="col-span-full bg-stone-900/50 p-5 rounded-xl border border-stone-800 space-y-4">
+                        <div>
+                            <span class="text-xs font-bold text-amber-400 uppercase tracking-wider">REPETICIONES</span>
+                            <h3 class="font-oriental text-lg font-bold text-white mt-1">Vídeos guardados</h3>
+                        </div>
+                        <div id="recorded-stream-list" class="grid md:grid-cols-2 gap-4"></div>
+                    </section>
+                    <section class="col-span-full bg-stone-900/50 p-5 rounded-xl border border-stone-800 space-y-4">
+                        <div>
+                            <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider">COLABORADORES</span>
+                            <h3 class="font-oriental text-lg font-bold text-white mt-1">Colaboradores destacados</h3>
+                        </div>
+                        <div id="featured-collaborators" class="grid sm:grid-cols-2 xl:grid-cols-3 gap-3"></div>
+                    </section>
+                </div>
+            </div>
+
+            <section id="seccion-social" data-user-view class="hidden space-y-5 animate-fade-up">
+                <header>
+                    <h2 class="font-oriental text-xl font-bold text-white">Comunidad y mensajes</h2>
+                    <p class="text-xs text-stone-400 mt-1">Encuentra jugadores, gestiona solicitudes y conversa con tus amigos.</p>
+                </header>
+                <div class="grid xl:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] gap-4">
+                    <div class="space-y-4">
+                        <form id="community-search-form" class="flex gap-2">
+                            <label for="community-search" class="sr-only">Buscar jugadores</label>
+                            <input id="community-search" minlength="2" maxlength="40" placeholder="Buscar por nickname…" class="min-w-0 flex-1 bg-black border border-stone-700 rounded-lg px-3 py-2 text-xs text-white">
+                            <button class="bg-red-600 hover:bg-red-700 px-4 rounded-lg text-xs font-bold">Buscar</button>
+                        </form>
+                        <div id="community-search-results" class="space-y-2" aria-live="polite"></div>
+                        <div class="bg-stone-900/70 border border-stone-800 rounded-xl p-4 space-y-3">
+                            <h3 class="font-bold text-sm">Solicitudes recibidas</h3>
+                            <div id="friend-incoming" class="space-y-2 text-xs"></div>
+                            <h3 class="font-bold text-sm border-t border-stone-800 pt-3">Solicitudes enviadas</h3>
+                            <div id="friend-outgoing" class="space-y-2 text-xs"></div>
+                        </div>
+                        <div class="bg-stone-900/70 border border-stone-800 rounded-xl p-4 space-y-3">
+                            <h3 class="font-bold text-sm">Mis amigos</h3>
+                            <div id="friend-list" class="space-y-2 text-xs"></div>
+                        </div>
+                    </div>
+                    <div class="bg-stone-900/70 border border-stone-800 rounded-xl overflow-hidden flex flex-col min-h-[420px]">
+                        <header id="chat-heading" class="p-4 border-b border-stone-800 text-sm font-bold">Elige un amigo para iniciar el chat</header>
+                        <div id="chat-messages" class="flex-1 min-h-0 overflow-y-auto p-4 space-y-2 text-xs" aria-live="polite"></div>
+                        <form id="chat-form" class="p-3 border-t border-stone-800 flex gap-2">
+                            <label for="chat-input" class="sr-only">Escribe un mensaje</label>
+                            <input id="chat-input" maxlength="1000" placeholder="Escribe un mensaje…" disabled class="min-w-0 flex-1 bg-black border border-stone-700 rounded-lg px-3 py-2 text-xs text-white disabled:opacity-50">
+                            <button id="chat-send" disabled class="bg-red-600 hover:bg-red-700 px-4 rounded-lg text-xs font-bold disabled:opacity-40">Enviar</button>
+                        </form>
+                    </div>
+                </div>
+                <p id="community-message" role="status" aria-live="polite" class="text-xs text-stone-400"></p>
+            </section>
+
+            <section id="panel-stream-creador" data-user-view class="hidden space-y-5 animate-fade-up">
+                <header class="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                        <h2 class="font-oriental text-xl font-bold text-white">Panel de retransmisión</h2>
+                        <p class="text-xs text-stone-400 mt-1">Conecta OBS por RTMP. Las transmisiones generan grabaciones en Mux.</p>
+                    </div>
+                    <span id="creator-stream-status" class="rounded-full bg-stone-800 px-3 py-1 text-[10px] text-stone-300">Sin canal</span>
+                </header>
+                <div class="bg-stone-900/80 border border-stone-800 rounded-xl p-4 space-y-4">
+                    <label class="block text-xs text-stone-300">Título de la transmisión
+                        <input id="creator-stream-title" maxlength="120" value="Cyber Win en vivo" class="mt-1 w-full bg-black border border-stone-700 rounded-lg px-3 py-2 text-white">
+                    </label>
+                    <div id="creator-stream-setup" class="flex flex-wrap gap-2">
+                        <button id="creator-stream-create" type="button" onclick="crearCanalStreaming()" class="bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg px-4 py-2 text-xs">Crear / cargar canal RTMP</button>
+                        <button id="creator-stream-reset" type="button" onclick="renovarClaveStreaming()" class="hidden bg-stone-800 hover:bg-stone-700 text-white font-bold rounded-lg px-4 py-2 text-xs">Renovar clave RTMP</button>
+                    </div>
+                    <div id="creator-stream-credentials" class="hidden space-y-3 border-t border-stone-800 pt-4">
+                        <label class="block text-[10px] text-stone-400">Servidor RTMP para OBS
+                            <div class="flex gap-2 mt-1"><input id="creator-stream-ingest" readonly class="min-w-0 flex-1 bg-black border border-stone-700 rounded-lg px-3 py-2 font-mono text-white"><button type="button" onclick="copiarValorStreaming('creator-stream-ingest')" class="bg-stone-800 rounded-lg px-3">Copiar</button></div>
+                        </label>
+                        <label class="block text-[10px] text-stone-400">Clave de transmisión (secreta)
+                            <div class="flex gap-2 mt-1"><input id="creator-stream-key" type="password" readonly class="min-w-0 flex-1 bg-black border border-stone-700 rounded-lg px-3 py-2 font-mono text-white"><button type="button" onclick="alternarVisibilidadClave()" class="bg-stone-800 rounded-lg px-3">Ver</button><button type="button" onclick="copiarValorStreaming('creator-stream-key')" class="bg-stone-800 rounded-lg px-3">Copiar</button></div>
+                        </label>
+                        <p class="text-[10px] text-amber-400">No compartas la clave. En OBS: Ajustes → Emisión → Servicio personalizado. El botón para renovar la invalida inmediatamente.</p>
+                    </div>
+                </div>
+                <div class="bg-stone-900/70 border border-stone-800 rounded-xl p-4 space-y-3">
+                    <h3 class="font-bold text-sm">Mis grabaciones</h3>
+                    <div id="creator-recording-list" class="grid md:grid-cols-2 gap-4"></div>
+                </div>
+                <p id="creator-stream-message" role="status" aria-live="polite" class="text-xs text-stone-400"></p>
+            </section>
+
+            </div>
+            </div>
+        </section>
+
+        <!-- VISTA 2: DETALLES COMPLETO DEL EVENTO SELECCIONADO -->
+        <section id="vista-evento-detalle" class="hidden space-y-6 animate-fade-up">
+            <button onclick="volverAlInicio()" class="text-xs bg-stone-900 text-stone-400 border border-stone-800 px-3 py-1.5 rounded hover:text-white active:scale-95">← Volver al Menú Principal</button>
+            
+            <div id="hero-torneo-detalle" class="bg-stone-900 p-6 rounded-lg border border-stone-800 relative overflow-hidden shadow-xl">
+                <!-- Rellenado dinámicamente -->
+            </div>
+
+            <!-- TABS DE NAVEGACIÓN -->
+            <div class="flex border-b border-stone-900 text-xs font-bold">
+                <button onclick="cambiarTabEvento('roster')" id="tab-roster" class="tab-btn py-2.5 px-4 border-b-2 border-red-600 text-white bg-stone-900/20">Clanes & Alineaciones</button>
+                <button onclick="cambiarTabEvento('reglas')" id="tab-reglas" class="tab-btn py-2.5 px-4 text-stone-400 hover:text-stone-200">Reglamento & Premios</button>
+            </div>
+
+            <div id="subvista-tab-roster" class="space-y-4">
+                <div class="flex justify-between items-center bg-black/40 p-3 rounded border border-stone-900">
+                    <div>
+                        <span id="contador-inscritos-label" class="text-xs font-bold font-mono text-amber-500"></span>
+                        <p class="text-[10px] text-stone-500">Cupos estrictamente asignados en orden de postulación.</p>
+                    </div>
+                    <button id="btn-activar-formulario-inscripcion" onclick="mostrarFormularioInscripcion()" class="bg-red-600 hover:bg-red-700 text-white font-bold text-xs px-4 py-2 rounded uppercase tracking-wide active:scale-95 shadow-md">Inscribir mi Club</button>
+                </div>
+
+                <div id="contenedor-logistica-especifica" class="space-y-4">
+                    <!-- Tabla o brackets -->
+                </div>
+            </div>
+
+            <div id="subvista-tab-reglas" class="hidden bg-stone-900/70 p-6 rounded-lg border border-stone-850 space-y-4 text-xs leading-relaxed">
+                <div>
+                    <h4 class="font-bold text-amber-500 uppercase tracking-widest text-[10px]">🎁 Distribución de Premios</h4>
+                    <p id="label-premios-detalle" class="whitespace-pre-line text-stone-300 mt-1 bg-black/30 p-3 rounded border border-stone-900 font-mono"></p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-red-500 uppercase tracking-widest text-[10px]">📜 Directrices Especiales de la Sala</h4>
+                    <p id="label-reglas-detalle" class="whitespace-pre-line text-stone-300 mt-1 bg-black/30 p-3 rounded border border-stone-900"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- VISTA 3: FORMULARIO DE INSCRIPCIÓN -->
+        <section id="vista-formulario-inscripcion" class="hidden max-w-xl mx-auto space-y-4 animate-fade-up">
+            <div class="flex justify-between items-center">
+                <h3 class="font-oriental font-bold text-base text-white tracking-wider">📝 FORMULARIO OFICIAL DE INSCRIPCIÓN</h3>
+                <button onclick="cancelarInscripcion()" class="text-stone-500 hover:text-stone-300 text-xs">Cancelar</button>
+            </div>
+
+            <form onsubmit="procesarInscripciónClub(event)" id="form-inscripcion" class="bg-stone-900/90 p-5 rounded-lg border border-stone-850 grid grid-cols-2 gap-4 text-xs shadow-xl">
+                <div class="col-span-2 bg-black/50 p-2.5 rounded border border-stone-850 text-[11px] text-amber-400">
+                    <strong>¡Atención Líder!</strong> Asegúrate de que los IDs/Nicks coincidan con el perfil in-game para evitar penalizaciones.
+                </div>
+                
+                <div class="col-span-2 sm:col-span-1">
+                    <label class="block text-stone-400 font-bold mb-1 uppercase text-[10px]">Nombre de tu Equipo *</label>
+                    <input type="text" id="club-nombre" required placeholder="Ej: Cyber Win Alpha" class="w-full p-2 bg-black border border-stone-850 text-white rounded focus:border-red-600 focus:ring-1 focus:ring-red-600">
+                </div>
+                <div class="col-span-2 sm:col-span-1">
+                    <label class="block text-stone-400 font-bold mb-1 uppercase text-[10px]">Logo Representativo (Opcional, Máx 300KB)</label>
+                    <input type="file" id="club-logo-file" accept="image/*" class="w-full p-1 bg-black border border-stone-850 text-stone-400 text-[11px] rounded cursor-pointer file:bg-stone-800 file:border-0 file:text-[10px] file:text-stone-300 file:px-2 file:py-0.5 file:rounded file:mr-2">
+                </div>
+
+                <div class="col-span-2 border-t border-stone-850 pt-2 font-bold text-red-500 uppercase tracking-wider text-[10px]">Alineación del Equipo:</div>
+                
+                <div>
+                    <label class="block text-stone-400 font-bold mb-0.5 text-[9px] uppercase">Capitán / Jugador 1 *</label>
+                    <input type="text" id="club-j1" required readonly class="w-full p-2 bg-stone-950 border border-stone-850 text-stone-400 font-semibold rounded focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-stone-400 font-bold mb-0.5 text-[9px] uppercase">Player Tag J1 *</label>
+                    <input type="text" id="club-id1" required readonly class="w-full p-2 bg-stone-950 border border-stone-850 text-stone-500 font-mono rounded focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-stone-400 font-bold mb-0.5 text-[9px] uppercase">Jugador 2 (Nickname) *</label>
+                    <input type="text" id="club-j2" required placeholder="Nick In-game" class="w-full p-2 bg-black border border-stone-850 text-white rounded focus:border-red-600 focus:ring-1 focus:ring-red-600">
+                </div>
+                <div>
+                    <label class="block text-stone-400 font-bold mb-0.5 text-[9px] uppercase">Player Tag J2 *</label>
+                    <input type="text" id="club-id2" required placeholder="Ej: #9UUY..." class="w-full p-2 bg-black border border-stone-850 text-white rounded font-mono uppercase focus:border-red-600 focus:ring-1 focus:ring-red-600">
+                </div>
+
+                <div>
+                    <label class="block text-stone-400 font-bold mb-0.5 text-[9px] uppercase">Jugador 3 (Nickname) *</label>
+                    <input type="text" id="club-j3" required placeholder="Nick In-game" class="w-full p-2 bg-black border border-stone-850 text-white rounded focus:border-red-600 focus:ring-1 focus:ring-red-600">
+                </div>
+                <div>
+                    <label class="block text-stone-400 font-bold mb-0.5 text-[9px] uppercase">Player Tag J3 *</label>
+                    <input type="text" id="club-id3" required placeholder="Ej: #LRPQ..." class="w-full p-2 bg-black border border-stone-850 text-white rounded font-mono uppercase focus:border-red-600 focus:ring-1 focus:ring-red-600">
+                </div>
+
+                <div>
+                    <label class="block text-stone-500 font-bold mb-0.5 text-[9px] uppercase">Suplente / Jugador 4 (Opcional)</label>
+                    <input type="text" id="club-j4" placeholder="Nick In-game" class="w-full p-2 bg-black border border-stone-850 text-white rounded focus:border-red-600 focus:ring-1 focus:ring-red-600">
+                </div>
+                <div>
+                    <label class="block text-stone-500 font-bold mb-0.5 text-[9px] uppercase">Player Tag Suplente</label>
+                    <input type="text" id="club-id4" placeholder="Ej: #88CC..." class="w-full p-2 bg-black border border-stone-850 text-white rounded font-mono uppercase focus:border-red-600 focus:ring-1 focus:ring-red-600">
+                </div>
+
+                <button type="submit" id="btn-enviar-inscripcion" class="col-span-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded text-xs uppercase tracking-wider shadow-lg shadow-emerald-950/40 active:scale-95 transition mt-2">Formalizar Registro de Clan</button>
+            </form>
+        </section>
+
+        <!-- VISTA 4: ÉXITO INSCRIPCIÓN -->
+        <section id="vista-exito-inscripcion" class="hidden max-w-md mx-auto bg-stone-900/95 p-6 rounded-lg border-2 border-emerald-600 text-center space-y-4 shadow-2xl animate-fade-up">
+            <span class="text-4xl block">🔥</span>
+            <h3 class="font-oriental font-bold text-lg text-white tracking-widest">¡INSCRIPCIÓN COMPLETA!</h3>
+            <p class="text-xs text-stone-400">Tu equipo ha sido dada de alta de manera satisfactoria.</p>
+            
+            <div class="bg-black p-4 rounded border border-stone-850 text-left font-mono space-y-2 text-[11px] shadow-inner relative">
+                <div class="text-amber-500 border-b border-stone-900 pb-1 font-bold text-xs uppercase">Comprobante de Registro</div>
+                <div><span class="text-stone-500">CLUB:</span> <span id="ticket-club" class="text-white font-bold"></span></div>
+                <div class="flex items-center gap-2 mt-2">
+                    <span class="text-stone-500">ESCUDO:</span>
+                    <img id="ticket-logo" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 24 24' fill='none' stroke='%23444' stroke-width='2'><circle cx='12' cy='12' r='10'/></svg>" class="h-6 w-6 object-cover rounded border border-stone-800">
+                </div>
+            </div>
+            <button onclick="finalizarYVerTabla()" class="w-full bg-stone-100 text-black font-bold py-2 rounded text-xs uppercase tracking-wider active:scale-95">Ir a Tabla del Torneo</button>
+        </section>
+
+    </main>
+
+    <!-- 🌐 MODALS EXTERNOS -->
+    <div id="modal-propuesta" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-stone-900 border border-stone-800 w-full max-w-md rounded-lg p-5 space-y-4 text-xs animate-fade-up">
+            <div class="flex justify-between items-center border-b border-stone-850 pb-2">
+                <h4 class="font-oriental font-bold text-amber-500 text-sm tracking-wider">💡 PROPONER NUEVA COPA</h4>
+                <button onclick="cerrarModalPropuesta()" class="text-stone-500 hover:text-white font-bold text-sm">×</button>
+            </div>
+            <form onsubmit="registrarPropuestaTorneo(event)" class="space-y-3">
+                <div>
+                    <label class="block text-stone-400 font-bold mb-1 uppercase text-[10px]">Nombre Tentativo *</label>
+                    <input type="text" id="prop-nombre" required class="w-full p-2 bg-black border border-stone-850 text-white rounded focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-stone-400 font-bold mb-1 uppercase text-[10px]">Formato de Juego *</label>
+                    <select id="prop-tipo" class="w-full p-2 bg-black border border-stone-850 text-stone-300 rounded">
+                        <option value="Copa 3v3 (Eliminación Directa)">Copa 3v3 (Eliminación Directa)</option>
+                        <option value="Liga 3v3 (Clasificación)">Liga 3v3 (Clasificación)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-stone-400 font-bold mb-1 uppercase text-[10px]">Detalles o Premios *</label>
+                    <textarea id="prop-detalles" rows="3" required class="w-full p-2 bg-black border border-stone-850 text-white rounded resize-none focus:outline-none"></textarea>
+                </div>
+                <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-black font-bold py-2 rounded text-xs uppercase tracking-wider active:scale-95 shadow-lg">Enviar Propuesta</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- SYSTEM FOOTER -->
+    <footer class="bg-black/60 border-t border-stone-950 py-4 px-4 text-xs mt-12">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="text-stone-500 font-mono text-[10px] text-center md:text-left">
+                © 2026 ⚜️Cyber Win⚜️. Perfiles sincronizados con Cyber Win.
+            </div>
+            <button onclick="abrirModalBug()" class="bg-stone-900 border border-stone-800 hover:border-red-900 hover:text-red-400 text-stone-400 px-3 py-1.5 rounded font-bold text-[10px] tracking-wide active:scale-95 shadow">⚠️ Reportar Incidencia</button>
+        </div>
+    </footer>
+
+    <!-- MODAL BUG -->
+    <div id="modal-bug" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-stone-900 border border-stone-800 w-full max-w-md rounded-lg p-5 space-y-4 text-xs animate-fade-up">
+            <div class="flex justify-between items-center border-b border-stone-850 pb-2">
+                <h4 class="font-oriental font-bold text-red-500 text-sm tracking-wider">🗃️ REPORTE TÉCNICO</h4>
+                <button onclick="cerrarModalBug()" class="text-stone-500 hover:text-white font-bold text-sm">×</button>
+            </div>
+            <form onsubmit="registrarBugComunidad(event)" class="space-y-3">
+                <div>
+                    <label class="block text-stone-400 font-bold mb-1 uppercase text-[10px]">Categoría *</label>
+                    <select id="bug-origen" class="w-full p-2 bg-black border border-stone-850 text-stone-300 rounded">
+                        <option value="Error de Interfaz">Error de Interfaz / Visual</option>
+                        <option value="Fallo en Inscripción">Fallo en Inscripción</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-stone-400 font-bold mb-1 uppercase text-[10px]">Descripción Detallada *</label>
+                    <textarea id="bug-desc" rows="4" required class="w-full p-2 bg-black border border-stone-850 text-white rounded resize-none focus:outline-none"></textarea>
+                </div>
+                <div>
+                    <label class="block text-stone-400 font-bold mb-1 uppercase text-[10px]">Contacto *</label>
+                    <input type="text" id="bug-contacto" required placeholder="Ej: +505 8888-8888" class="w-full p-2 bg-black border border-stone-850 text-white rounded focus:outline-none">
+                </div>
+                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded text-xs uppercase tracking-wider active:scale-95 shadow-lg">Emitir Ticket</button>
+            </form>
+        </div>
+    </div>
+
+    <button id="assistant-launcher" type="button" onclick="toggleAsistente()" class="fixed bottom-5 right-5 z-[70] grid place-items-center bg-slate-950 border border-cyan-400/70 rounded-2xl w-16 h-16 shadow-xl assistant-glow" aria-label="Abrir asistente" aria-expanded="false">
+        <span class="assistant-mascot" aria-hidden="true"><span class="assistant-mascot__antenna"></span><span class="assistant-mascot__visor"><i></i><i></i></span><span class="assistant-mascot__mouth"></span></span>
+    </button>
+    <section id="assistant-panel" class="hidden fixed bottom-24 right-4 z-[70] w-[min(92vw,380px)] bg-stone-950 border border-cyan-900/70 rounded-xl shadow-2xl assistant-glow overflow-hidden" aria-label="Asistente Cyber Win">
+        <header class="flex items-center justify-between bg-stone-900 p-3 border-b border-stone-800">
+            <div class="flex items-center gap-3">
+                <span class="assistant-mascot scale-75 origin-left" aria-hidden="true"><span class="assistant-mascot__antenna"></span><span class="assistant-mascot__visor"><i></i><i></i></span><span class="assistant-mascot__mouth"></span></span>
+                <div><h3 class="text-sm font-bold text-white">NOVA · Asistente Cyber Win</h3><p class="text-[9px] text-cyan-300">RTX-style FX · brillos simulados por CSS</p></div>
+            </div>
+            <button type="button" onclick="toggleAsistente(false)" class="text-stone-400 hover:text-white" aria-label="Cerrar asistente">✕</button>
+        </header>
+        <p class="px-3 pt-2 text-[9px] text-stone-500">Personaje original 2D. Los efectos de luz son visuales: no activan ray tracing de GPU.</p>
+        <div id="assistant-messages" class="h-64 overflow-y-auto p-3 space-y-2 text-xs" aria-live="polite">
+            <p class="bg-cyan-950/50 border border-cyan-900/60 rounded-xl p-3 text-stone-200 mr-5">¡Hey! Soy NOVA, tu copiloto de Cyber Win. Puedo guiarte con torneos, amistades, mensajes, creadores y tu perfil. ¿Qué misión empezamos?</p>
+        </div>
+        <form onsubmit="enviarMensajeAsistente(event)" class="flex gap-2 p-3 border-t border-stone-800">
+            <input id="assistant-input" required maxlength="240" placeholder="Escribe tu pregunta…" class="min-w-0 flex-1 bg-black border border-stone-700 rounded p-2 text-xs text-white">
+            <button class="bg-red-600 text-white rounded px-3 text-xs font-bold">Enviar</button>
+        </form>
+    </section>
+
+    <!-- JAVASCRIPT CORE -->
+    <script>
+        /**
+         * @typedef {'red'|'ocean'|'forest'|'violet'|'rose'|'gold'|'cyber'|'arctic'|'sunset'|'mono'} TemaCyberWin
+         * @typedef {{email: string, nickname: string, tag: string}} PerfilCyberWin
+         */
+        let datosEventos = [];
+        let eventoActivoId = null;
+        let configuracionPublica = {};
+        let selectedFriendId = null;
+        let communityRequestPending = false;
+        let chatRequestSequence = 0;
+        /** @type {TemaCyberWin[]} */
+        const temasDisponibles = ['red', 'ocean', 'forest', 'violet', 'rose', 'gold', 'cyber', 'arctic', 'sunset', 'mono'];
+
+        function sanitizarHTML(cadena) {
+            if (!cadena) return '';
+            return cadena.toString()
+                .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        function irASeccionUsuario(id) {
+            document.querySelectorAll('[data-user-view]').forEach(view => view.classList.toggle('hidden', view.id !== id));
+            document.querySelectorAll('[data-user-nav]').forEach(button => {
+                if (button.dataset.userNav === id) button.setAttribute('aria-current', 'page');
+                else button.removeAttribute('aria-current');
+            });
+            if (id === 'seccion-social') cargarComunidad();
+            if (id === 'seccion-creadores') {
+                renderizerListaAfiliadosTikTok();
+                cargarStreamingsPublicos();
+                cargarColaboradoresDestacados();
+            }
+            if (id === 'panel-stream-creador') cargarPanelStreamingCreador();
+        }
+
+        function abrirCuentaUsuario() {
+            irASeccionUsuario('panel-cuenta-usuario');
+            document.getElementById('account-message').textContent = '';
+            const profile = window.cyberWinAuthState?.profile;
+            if (profile) mostrarVistaPreviaPerfil(profile);
+        }
+
+        function cerrarPanelCuenta() {
+            irASeccionUsuario('seccion-eventos');
+        }
+
+        function mostrarVistaPreviaPerfil(perfil) {
+            const avatar = document.getElementById('profile-avatar-preview');
+            const banner = document.getElementById('profile-banner-preview');
+            if (!avatar || !banner) return;
+            avatar.src = perfil.avatar || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80"%3E%3Crect width="80" height="80" rx="40" fill="%23333333"/%3E%3Ctext x="40" y="52" text-anchor="middle" font-size="38" fill="white"%3E%E2%98%BA%3C/text%3E%3C/svg%3E';
+            banner.style.backgroundColor = perfil.bannerColor || '#1c1917';
+            banner.style.backgroundImage = perfil.banner ? `url("${perfil.banner}")` : 'none';
+        }
+
+        function actualizarVistaPreviaBanner() {
+            const banner = document.getElementById('profile-banner-preview');
+            if (banner) banner.style.backgroundColor = document.getElementById('account-banner-color').value;
+        }
+
+        function actualizarVistaPreviaBannerImagen(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 12 * 1024 * 1024) {
+                event.target.value = '';
+                document.getElementById('account-message').textContent = 'El banner debe ser JPEG, PNG o WebP y no superar 12 MB antes de optimizarse.';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = () => {
+                const banner = document.getElementById('profile-banner-preview');
+                banner.style.backgroundImage = `url("${reader.result}")`;
+                banner.style.backgroundColor = document.getElementById('account-banner-color').value;
+            };
+            reader.onerror = () => {
+                document.getElementById('account-message').textContent = 'No se pudo leer la imagen del banner.';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function actualizarVistaPreviaAvatar(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 12 * 1024 * 1024) {
+                event.target.value = '';
+                document.getElementById('account-message').textContent = 'El avatar debe ser JPEG, PNG o WebP y no superar 12 MB antes de optimizarse.';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = () => document.getElementById('profile-avatar-preview').src = reader.result;
+            reader.onerror = () => {
+                document.getElementById('account-message').textContent = 'No se pudo leer la imagen de perfil.';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function agregarAvatarUsuario(contenedor, usuario, clase = 'w-9 h-9') {
+            if (usuario.avatar) {
+                const avatar = document.createElement('img');
+                avatar.src = usuario.avatar;
+                avatar.alt = '';
+                avatar.className = `${clase} rounded-full object-cover bg-stone-800`;
+                contenedor.appendChild(avatar);
+            } else {
+                const avatar = document.createElement('span');
+                avatar.className = `${clase} rounded-full grid place-items-center bg-stone-800`;
+                avatar.textContent = '👤';
+                contenedor.appendChild(avatar);
+            }
+        }
+
+        function setCommunityMessage(message, isError = false) {
+            const status = document.getElementById('community-message');
+            status.textContent = message;
+            status.classList.toggle('text-red-400', isError);
+            status.classList.toggle('text-stone-400', !isError);
+        }
+
+        function renderMuxPlayer(contenedor, playbackId, streamType) {
+            if (!/^[A-Za-z0-9_-]{5,128}$/.test(playbackId || '')) return;
+            const player = document.createElement('mux-player');
+            player.setAttribute('playback-id', playbackId);
+            player.setAttribute('stream-type', streamType);
+            player.setAttribute('controls', '');
+            player.setAttribute('playsinline', '');
+            player.className = 'block w-full aspect-video rounded-lg overflow-hidden bg-black';
+            contenedor.appendChild(player);
+        }
+
+        async function cargarStreamingsPublicos() {
+            const liveContainer = document.getElementById('live-stream-list');
+            const recordingsContainer = document.getElementById('recorded-stream-list');
+            liveContainer.replaceChildren();
+            recordingsContainer.replaceChildren();
+            try {
+                const [liveResponse, recordingsResponse] = await Promise.all([
+                    fetch('/api/streams/live'),
+                    fetch('/api/streams/videos')
+                ]);
+                if (!liveResponse.ok || !recordingsResponse.ok) throw new Error('No se pudieron cargar los vídeos de la comunidad.');
+                const liveData = await liveResponse.json();
+                const recordingsData = await recordingsResponse.json();
+                if (!liveData.streams.length) liveContainer.textContent = 'No hay retransmisiones activas en este momento.';
+                liveData.streams.forEach(stream => {
+                    const card = document.createElement('article');
+                    card.className = 'bg-black/50 border border-red-900/60 rounded-xl p-3 space-y-2';
+                    const title = document.createElement('h4');
+                    title.className = 'font-bold text-sm text-white';
+                    title.textContent = `🔴 EN VIVO · ${stream.title}`;
+                    const creator = document.createElement('p');
+                    creator.className = 'text-[10px] text-stone-400';
+                    creator.textContent = stream.displayName || stream.creator;
+                    card.append(title, creator);
+                    renderMuxPlayer(card, stream.playbackId, 'live');
+                    liveContainer.appendChild(card);
+                });
+                if (!recordingsData.videos.length) recordingsContainer.textContent = 'Todavía no hay vídeos archivados.';
+                recordingsData.videos.forEach(video => {
+                    const card = document.createElement('article');
+                    card.className = 'bg-black/50 border border-stone-800 rounded-xl p-3 space-y-2';
+                    const title = document.createElement('h4');
+                    title.className = 'font-bold text-sm text-white';
+                    title.textContent = video.title;
+                    const creator = document.createElement('p');
+                    creator.className = 'text-[10px] text-stone-400';
+                    creator.textContent = `${video.creator} · ${new Date(video.createdAt).toLocaleDateString()}`;
+                    card.append(title, creator);
+                    renderMuxPlayer(card, video.playbackId, 'on-demand');
+                    recordingsContainer.appendChild(card);
+                });
+            } catch (error) {
+                liveContainer.textContent = error.message;
+                recordingsContainer.textContent = 'No se pudieron actualizar las grabaciones.';
+            }
+        }
+
+        async function cargarColaboradoresDestacados() {
+            const container = document.getElementById('featured-collaborators');
+            container.replaceChildren();
+            try {
+                const response = await fetch('/api/creators/featured');
+                if (!response.ok) throw new Error('No se pudieron cargar los colaboradores destacados.');
+                const data = await response.json();
+                if (!data.collaborators.length) {
+                    container.textContent = 'Pronto anunciaremos a nuestros colaboradores destacados.';
+                    return;
+                }
+                data.collaborators.forEach(collaborator => {
+                    const card = document.createElement('article');
+                    card.className = 'bg-black/50 border border-stone-800 rounded-xl p-4 space-y-2';
+                    const name = document.createElement('h4');
+                    name.className = 'font-bold text-white';
+                    name.textContent = collaborator.display_name;
+                    const category = document.createElement('p');
+                    category.className = 'text-[9px] uppercase tracking-wider text-amber-400';
+                    category.textContent = collaborator.category;
+                    const bio = document.createElement('p');
+                    bio.className = 'text-xs text-stone-300 whitespace-pre-line';
+                    bio.textContent = collaborator.bio || '';
+                    const links = document.createElement('div');
+                    links.className = 'flex flex-wrap gap-2 pt-1';
+                    Object.entries(collaborator.social_links || {}).forEach(([network, url]) => {
+                        if (!/^https?:\/\//i.test(url)) return;
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.target = '_blank';
+                        link.rel = 'noopener noreferrer';
+                        link.className = 'rounded-full bg-stone-800 hover:bg-red-900 px-2.5 py-1 text-[10px] text-stone-200 capitalize';
+                        link.textContent = network === 'x' ? 'X' : network;
+                        links.appendChild(link);
+                    });
+                    card.append(name, category, bio, links);
+                    container.appendChild(card);
+                });
+            } catch (error) {
+                container.textContent = error.message;
+            }
+        }
+
+        function mostrarDatosCanalStreaming(stream) {
+            document.getElementById('creator-stream-status').textContent = stream.status === 'active' ? 'EN VIVO' : stream.status.toUpperCase();
+            document.getElementById('creator-stream-status').className = `rounded-full px-3 py-1 text-[10px] ${stream.status === 'active' ? 'bg-red-950 text-red-300' : 'bg-stone-800 text-stone-300'}`;
+            document.getElementById('creator-stream-title').value = stream.title || 'Cyber Win en vivo';
+            document.getElementById('creator-stream-ingest').value = stream.ingestUrl;
+            document.getElementById('creator-stream-key').value = stream.streamKey;
+            document.getElementById('creator-stream-credentials').classList.remove('hidden');
+            document.getElementById('creator-stream-reset').classList.remove('hidden');
+        }
+
+        async function cargarPanelStreamingCreador() {
+            const message = document.getElementById('creator-stream-message');
+            const recordings = document.getElementById('creator-recording-list');
+            recordings.replaceChildren();
+            try {
+                const data = await window.cyberWinAuth.request('/api/creator/stream');
+                if (data.stream) mostrarDatosCanalStreaming(data.stream);
+                else {
+                    document.getElementById('creator-stream-status').textContent = 'Sin canal RTMP';
+                    document.getElementById('creator-stream-credentials').classList.add('hidden');
+                    document.getElementById('creator-stream-reset').classList.add('hidden');
+                }
+                if (!data.assets.length) recordings.textContent = 'Las grabaciones aparecerán aquí cuando Mux las procese.';
+                data.assets.forEach(asset => {
+                    const card = document.createElement('article');
+                    card.className = 'bg-black/50 border border-stone-800 rounded-lg p-3 space-y-2';
+                    const title = document.createElement('h4');
+                    title.className = 'text-xs font-bold text-white';
+                    title.textContent = asset.title;
+                    const status = document.createElement('p');
+                    status.className = 'text-[10px] text-stone-400';
+                    status.textContent = `${asset.status} · ${new Date(asset.createdAt).toLocaleString()}`;
+                    card.append(title, status);
+                    if (asset.status === 'ready' && asset.playbackId) renderMuxPlayer(card, asset.playbackId, 'on-demand');
+                    recordings.appendChild(card);
+                });
+                message.textContent = '';
+            } catch (error) {
+                message.textContent = error.message;
+                message.classList.add('text-red-400');
+            }
+        }
+
+        async function crearCanalStreaming() {
+            const button = document.getElementById('creator-stream-create');
+            button.disabled = true;
+            try {
+                const data = await window.cyberWinAuth.request('/api/creator/stream', {
+                    method: 'POST',
+                    body: JSON.stringify({ title: document.getElementById('creator-stream-title').value.trim() })
+                });
+                mostrarDatosCanalStreaming(data.stream);
+                document.getElementById('creator-stream-message').textContent = 'Canal listo. Copia el servidor RTMP y la clave en OBS.';
+            } catch (error) {
+                document.getElementById('creator-stream-message').textContent = error.message;
+                document.getElementById('creator-stream-message').classList.add('text-red-400');
+            } finally {
+                button.disabled = false;
+            }
+        }
+
+        async function renovarClaveStreaming() {
+            if (!confirm('La clave actual dejará de funcionar inmediatamente. ¿Deseas renovarla?')) return;
+            try {
+                const data = await window.cyberWinAuth.request('/api/creator/stream/reset-key', {
+                    method: 'POST',
+                    body: JSON.stringify({})
+                });
+                document.getElementById('creator-stream-key').value = data.streamKey;
+                document.getElementById('creator-stream-status').textContent = data.status.toUpperCase();
+                document.getElementById('creator-stream-message').textContent = 'Clave renovada; actualiza OBS antes de iniciar.';
+            } catch (error) {
+                document.getElementById('creator-stream-message').textContent = error.message;
+                document.getElementById('creator-stream-message').classList.add('text-red-400');
+            }
+        }
+
+        function alternarVisibilidadClave() {
+            const input = document.getElementById('creator-stream-key');
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        async function copiarValorStreaming(id) {
+            const input = document.getElementById(id);
+            try {
+                await navigator.clipboard.writeText(input.value);
+                document.getElementById('creator-stream-message').textContent = 'Copiado al portapapeles.';
+            } catch (error) {
+                document.getElementById('creator-stream-message').textContent = `No se pudo copiar: ${error.message}`;
+                document.getElementById('creator-stream-message').classList.add('text-red-400');
+            }
+        }
+
+        async function buscarUsuariosComunidad(event) {
+            event.preventDefault();
+            const query = document.getElementById('community-search').value.trim();
+            const results = document.getElementById('community-search-results');
+            results.replaceChildren();
+            if (query.length < 2) {
+                setCommunityMessage('Escribe al menos 2 caracteres para buscar.', true);
+                return;
+            }
+            try {
+                const data = await window.cyberWinAuth.request(`/api/community/users?search=${encodeURIComponent(query)}`);
+                if (!data.users.length) {
+                    results.textContent = 'No encontramos perfiles con ese nickname.';
+                    return;
+                }
+                data.users.forEach(usuario => {
+                    const row = document.createElement('div');
+                    row.className = 'flex items-center gap-3 bg-black/50 border border-stone-800 rounded-lg p-3';
+                    agregarAvatarUsuario(row, usuario);
+                    const details = document.createElement('div');
+                    details.className = 'min-w-0 flex-1';
+                    const name = document.createElement('p');
+                    name.className = 'font-bold truncate';
+                    name.textContent = usuario.nickname;
+                    const tag = document.createElement('p');
+                    tag.className = 'text-[10px] text-stone-500 font-mono';
+                    tag.textContent = usuario.player_tag;
+                    details.append(name, tag);
+                    const send = document.createElement('button');
+                    send.type = 'button';
+                    send.className = 'bg-red-600 hover:bg-red-700 rounded px-3 py-2 text-[10px] font-bold';
+                    send.textContent = 'Agregar';
+                    send.addEventListener('click', () => enviarSolicitudAmistad(usuario, send));
+                    row.append(details, send);
+                    results.appendChild(row);
+                });
+                setCommunityMessage('');
+            } catch (error) {
+                setCommunityMessage(error.message, true);
+            }
+        }
+
+        async function enviarSolicitudAmistad(usuario, boton) {
+            boton.disabled = true;
+            try {
+                await window.cyberWinAuth.request('/api/friends/requests', {
+                    method: 'POST',
+                    body: JSON.stringify({ userId: usuario.id })
+                });
+                boton.textContent = 'Solicitud enviada';
+                setCommunityMessage(`Solicitud enviada a ${usuario.nickname}.`);
+                await cargarComunidad();
+            } catch (error) {
+                setCommunityMessage(error.message, true);
+                boton.disabled = false;
+            }
+        }
+
+        async function responderSolicitudAmistad(solicitudId, status) {
+            try {
+                await window.cyberWinAuth.request(`/api/friends/requests/${encodeURIComponent(solicitudId)}/respond`, {
+                    method: 'POST',
+                    body: JSON.stringify({ status })
+                });
+                setCommunityMessage(status === 'accepted' ? 'Solicitud aceptada. Ya pueden chatear.' : 'Solicitud rechazada.');
+                await cargarComunidad();
+            } catch (error) {
+                setCommunityMessage(error.message, true);
+            }
+        }
+
+        async function cargarComunidad() {
+            if (communityRequestPending || !window.cyberWinAuth) return;
+            communityRequestPending = true;
+            try {
+                const data = await window.cyberWinAuth.request('/api/friends');
+                const incoming = document.getElementById('friend-incoming');
+                const outgoing = document.getElementById('friend-outgoing');
+                const friends = document.getElementById('friend-list');
+                incoming.replaceChildren();
+                outgoing.replaceChildren();
+                friends.replaceChildren();
+                const solicitudesEntrantes = data.requests.filter(request => !request.outgoing);
+                const solicitudesSalientes = data.requests.filter(request => request.outgoing);
+                incoming.textContent = solicitudesEntrantes.length ? '' : 'No tienes solicitudes pendientes.';
+                solicitudesEntrantes.forEach(request => {
+                    const row = document.createElement('div');
+                    row.className = 'flex items-center gap-2 bg-black/40 rounded-lg p-2';
+                    const details = document.createElement('span');
+                    details.className = 'flex-1 min-w-0 truncate';
+                    details.textContent = request.nickname;
+                    const accept = document.createElement('button');
+                    accept.type = 'button';
+                    accept.className = 'text-emerald-400 font-bold';
+                    accept.textContent = 'Aceptar';
+                    accept.addEventListener('click', () => responderSolicitudAmistad(request.id, 'accepted'));
+                    const reject = document.createElement('button');
+                    reject.type = 'button';
+                    reject.className = 'text-red-400 font-bold';
+                    reject.textContent = 'Rechazar';
+                    reject.addEventListener('click', () => responderSolicitudAmistad(request.id, 'rejected'));
+                    row.append(details, accept, reject);
+                    incoming.appendChild(row);
+                });
+                outgoing.textContent = solicitudesSalientes.length ? '' : 'No has enviado solicitudes pendientes.';
+                solicitudesSalientes.forEach(request => {
+                    const row = document.createElement('p');
+                    row.className = 'bg-black/40 rounded-lg p-2 text-stone-400';
+                    row.textContent = `Pendiente: ${request.nickname}`;
+                    outgoing.appendChild(row);
+                });
+                friends.textContent = data.friends.length ? '' : 'Aún no tienes amigos. Busca jugadores por su nickname.';
+                data.friends.forEach(friend => {
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = `w-full flex items-center gap-3 bg-black/40 hover:bg-stone-800 rounded-lg p-2 text-left ${selectedFriendId === friend.id ? 'ring-1 ring-red-500' : ''}`;
+                    agregarAvatarUsuario(button, friend);
+                    const name = document.createElement('span');
+                    name.className = 'truncate font-semibold flex-1';
+                    name.textContent = friend.nickname;
+                    button.appendChild(name);
+                    const unreadCount = Number(friend.unreadCount) || 0;
+                    if (unreadCount > 0) {
+                        const unread = document.createElement('span');
+                        unread.className = 'shrink-0 rounded-full bg-red-600 px-2 py-0.5 text-[9px] font-bold text-white';
+                        unread.textContent = unreadCount > 99 ? '99+' : String(unreadCount);
+                        unread.setAttribute('aria-label', `${unreadCount} mensajes sin leer`);
+                        button.appendChild(unread);
+                    }
+                    button.addEventListener('click', () => seleccionarAmigo(friend));
+                    friends.appendChild(button);
+                });
+                if (selectedFriendId && !data.friends.some(friend => friend.id === selectedFriendId)) {
+                    selectedFriendId = null;
+                    document.getElementById('chat-heading').textContent = 'Elige un amigo para iniciar el chat';
+                    document.getElementById('chat-input').disabled = true;
+                    document.getElementById('chat-send').disabled = true;
+                    document.getElementById('chat-messages').replaceChildren();
+                }
+            } catch (error) {
+                setCommunityMessage(error.message, true);
+            } finally {
+                communityRequestPending = false;
+            }
+        }
+
+        async function seleccionarAmigo(friend) {
+            selectedFriendId = friend.id;
+            document.getElementById('chat-heading').textContent = `Chat con ${friend.nickname}`;
+            document.getElementById('chat-input').disabled = false;
+            document.getElementById('chat-send').disabled = false;
+            await cargarComunidad();
+            await cargarMensajesChat();
+            await cargarComunidad();
+            document.getElementById('chat-input').focus();
+        }
+
+        async function cargarMensajesChat() {
+            if (!selectedFriendId) return;
+            const friendId = selectedFriendId;
+            const requestId = ++chatRequestSequence;
+            try {
+                const data = await window.cyberWinAuth.request(`/api/friends/${encodeURIComponent(friendId)}/messages`);
+                if (friendId !== selectedFriendId || requestId !== chatRequestSequence) return;
+                const container = document.getElementById('chat-messages');
+                container.replaceChildren();
+                const currentId = window.cyberWinAuthState?.user?.uid;
+                data.messages.forEach(message => {
+                    const bubble = document.createElement('p');
+                    bubble.className = `chat-message rounded-xl px-3 py-2 ${message.senderId === currentId ? 'ml-auto bg-red-900/70 text-white' : 'mr-auto bg-stone-800 text-stone-200'}`;
+                    const text = document.createElement('span');
+                    text.textContent = message.message;
+                    const time = document.createElement('time');
+                    time.className = 'block mt-1 text-[9px] opacity-60';
+                    time.dateTime = message.createdAt;
+                    time.textContent = new Date(message.createdAt).toLocaleString();
+                    bubble.append(text, time);
+                    if (message.senderId === currentId && message.readAt) {
+                        const receipt = document.createElement('span');
+                        receipt.className = 'block text-right text-[9px] text-emerald-300';
+                        receipt.textContent = '✓ Leído';
+                        bubble.appendChild(receipt);
+                    }
+                    container.appendChild(bubble);
+                });
+                container.scrollTop = container.scrollHeight;
+            } catch (error) {
+                setCommunityMessage(error.message, true);
+            }
+        }
+
+        async function enviarMensajeChat(event) {
+            event.preventDefault();
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (!selectedFriendId || !message) return;
+            const submit = document.getElementById('chat-send');
+            submit.disabled = true;
+            try {
+                await window.cyberWinAuth.request(`/api/friends/${encodeURIComponent(selectedFriendId)}/messages`, {
+                    method: 'POST',
+                    body: JSON.stringify({ message })
+                });
+                input.value = '';
+                await cargarMensajesChat();
+            } catch (error) {
+                setCommunityMessage(error.message, true);
+            } finally {
+                submit.disabled = false;
+                input.focus();
+            }
+        }
+
+        function toggleAsistente(forceOpen) {
+            const panel = document.getElementById('assistant-panel');
+            const open = typeof forceOpen === 'boolean' ? forceOpen : panel.classList.contains('hidden');
+            panel.classList.toggle('hidden', !open);
+            document.getElementById('assistant-launcher').setAttribute('aria-expanded', String(open));
+            if (open) document.getElementById('assistant-input').focus();
+        }
+
+        function enviarMensajeAsistente(event) {
+            event.preventDefault();
+            const input = document.getElementById('assistant-input');
+            const message = input.value.trim();
+            if (!message) return;
+            const messages = document.getElementById('assistant-messages');
+            const userMessage = document.createElement('p');
+            userMessage.className = 'bg-red-950/70 rounded p-2 text-white ml-8 break-words';
+            userMessage.textContent = message;
+            messages.appendChild(userMessage);
+
+            const query = message.toLocaleLowerCase();
+            let answer = 'Puedo orientarte sobre registro, torneos, avisos o creadores. Prueba preguntando por una de esas opciones.';
+            if (/registro|registr|cuenta|correo|contraseñ/.test(query)) answer = 'Para crear una cuenta usa tu correo, una contraseña de al menos 8 caracteres, nickname y Player Tag. Si ya tienes cuenta, elige “Iniciar sesión”. Puedes recuperar tu contraseña desde el enlace del formulario.';
+            else if (/torneo|inscrip|equipo|clan|bracket|llave|premio|regla/.test(query)) {
+                const eventos = datosEventos.length
+                    ? datosEventos.slice(0, 3).map(evento => `${evento.nombre || evento.titulo || 'Torneo'} (${evento.estado || 'estado por confirmar'})`).join('; ')
+                    : 'Todavía no hay torneos cargados en la vista';
+                answer = `En “🏆 Torneos” puedes consultar reglas, premios, cupos e inscripciones. ${eventos}. Abre una tarjeta para ver sus detalles.`;
+            }
+            else if (/aviso|noticia|novedad/.test(query)) answer = 'Los avisos oficiales aparecen en la sección “📢 Avisos”. Actualiza la página si no ves una publicación reciente.';
+            else if (/creador|live|directo|stream|transmi/.test(query)) answer = 'Abre “🔴 Streamings” para ver canales oficiales. Los que tienen un enlace de directo configurado aparecen destacados con la etiqueta EN VIVO.';
+            else if (/postul|aplicar.*creador|ser creador/.test(query)) answer = 'Abre “🔴 Streamings” y toca “Postularme”. El administrador revisa tu cuenta; cuando la apruebe, tu usuario recibirá el rol de creador y aparecerá el panel “Mi streaming”.';
+            else if (/amistad|amigo|solicitud|buscar jugador|chat|mensaje/.test(query)) answer = 'En “💬 Amigos y chat” busca por nickname y envía la solicitud. La otra persona debe aceptarla. Después, abre su conversación para leer y responder; los mensajes nuevos y no leídos se actualizan mientras tengas abierta esta sección.';
+            else if (/foto|avatar|banner|nickname|nick|tema|color|personal|aparien/.test(query)) answer = 'En “👤 Mi perfil” puedes editar tu nickname, Player Tag, avatar, imagen y color del banner, tema y color de acento. Las fotos se optimizan al subirlas y se guardan en tu perfil.';
+            else if (/problema|ayuda|soporte|error/.test(query)) answer = 'Puedes enviar un reporte técnico con el botón “Reportar Incidencia” al final de la página. No incluyas contraseñas ni información privada.';
+            else if (/hola|buenas|saludo/.test(query)) answer = '¡Hola! Puedo ayudarte a encontrar torneos, añadir amigos, usar el chat, personalizar tu perfil o localizar los streamings. ¿Qué buscas?';
+            else if (/gracias/.test(query)) answer = '¡De nada! Si te queda alguna duda, dime qué sección o función necesitas y te guío.';
+
+            const assistantMessage = document.createElement('p');
+            assistantMessage.className = 'bg-stone-800 rounded p-2 text-stone-200 mr-4 whitespace-pre-line';
+            assistantMessage.textContent = answer;
+            messages.appendChild(assistantMessage);
+            input.value = '';
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('account-accent').addEventListener('input', event => {
+                event.target.dataset.customized = 'true';
+            });
+            document.getElementById('account-banner-color').addEventListener('input', actualizarVistaPreviaBanner);
+            document.getElementById('account-avatar-file').addEventListener('change', actualizarVistaPreviaAvatar);
+            document.getElementById('account-banner-file').addEventListener('change', actualizarVistaPreviaBannerImagen);
+            document.getElementById('community-search-form').addEventListener('submit', buscarUsuariosComunidad);
+            document.getElementById('chat-form').addEventListener('submit', enviarMensajeChat);
+            const firebaseConfig = window.CYBERWIN_FIREBASE_CONFIG;
+            const firebaseConfigured = firebaseConfig?.apiKey && !firebaseConfig.apiKey.startsWith('REPLACE_')
+                && firebaseConfig.projectId && !firebaseConfig.projectId.startsWith('REPLACE_')
+                && firebaseConfig.appId && !firebaseConfig.appId.startsWith('REPLACE_');
+            if (!window.cyberWinAuthState) window.cyberWinAuthState = { ready: true, user: null, profile: null };
+            if (!firebaseConfigured) {
+                document.getElementById('user-auth-message').textContent = 'Configura Firebase en firebase-config.js para usar el acceso con correo.';
+                document.getElementById('user-auth-form').addEventListener('submit', event => event.preventDefault());
+            }
+            aplicarTemaGuardado();
+            inicializarConfiguracionesGlobales();
+            comprobarSesionUsuario();
+            window.addEventListener('cyberwin:auth-changed', comprobarSesionUsuario);
+            window.addEventListener('storage', actualizarDatosCompartidos);
+            window.setInterval(() => {
+                if (!document.getElementById('vista-inicio').classList.contains('hidden')) {
+                    renderizarEventosPublicos();
+                    renderizarAvisosPublicos();
+                    renderizerListaAfiliadosTikTok();
+                    inicializarConfiguracionesGlobales();
+                }
+            }, 60000);
+            window.setInterval(() => {
+                if (!document.getElementById('seccion-social').classList.contains('hidden')) cargarComunidad();
+            }, 5000);
+            window.setInterval(() => {
+                if (selectedFriendId && !document.getElementById('seccion-social').classList.contains('hidden')) cargarMensajesChat();
+            }, 5000);
+        });
+
+        /**
+         * @param {string} tema
+         * @returns {tema is TemaCyberWin}
+         */
+        /** @param {string} tema @returns {tema is TemaCyberWin} */
+        function esTemaCyberWin(tema) {
+            return temasDisponibles.some(temaValido => temaValido === tema);
+        }
+
+        /** @param {string} tema */
+        function cambiarTema(tema) {
+            if (!esTemaCyberWin(tema)) return;
+            const paleta = {
+                red: '#dc2626', ocean: '#0891b2', forest: '#16a34a', violet: '#9333ea',
+                rose: '#e11d48', gold: '#d97706', cyber: '#06b6d4', arctic: '#38bdf8',
+                sunset: '#f97316', mono: '#a1a1aa'
+            };
+            const colorPicker = document.getElementById('account-accent');
+            const color = colorPicker?.dataset.customized === 'true' ? colorPicker.value : paleta[tema];
+            if (colorPicker && colorPicker.dataset.customized !== 'true') colorPicker.value = color;
+            if (window.cyberWinAuth) {
+                window.cyberWinAuth.applyTheme(tema, color);
+            } else {
+                document.body.dataset.theme = tema;
+                document.body.style.setProperty('--custom-accent', color);
+            }
+            const perfil = JSON.parse(localStorage.getItem('liga_bs_usuario_activo'));
+            if (perfil && perfil.email) {
+                perfil.theme = tema;
+                perfil.accentColor = color;
+                localStorage.setItem('liga_bs_usuario_activo', JSON.stringify(perfil));
+                localStorage.setItem(`liga_bs_tema_usuario:${perfil.email}`, tema);
+                if (window.cyberWinAuth && perfil.nickname && perfil.tag) {
+                    window.cyberWinAuth.saveProfile({
+                        nickname: perfil.nickname,
+                        tag: perfil.tag,
+                        theme: tema,
+                        accentColor: color
+                    }).catch(error => {
+                        const message = document.getElementById('account-message');
+                        if (message) {
+                            message.textContent = `No se pudo sincronizar el tema: ${error.message}`;
+                            message.classList.add('text-red-400');
+                        }
+                    });
+                }
+            }
+            localStorage.setItem('liga_bs_tema', tema);
+            const cuentaTema = document.getElementById('account-theme');
+            if (cuentaTema) cuentaTema.value = tema;
+        }
+
+        function aplicarTemaAleatorio() {
+            const temas = temasDisponibles.filter(tema => tema !== document.body.dataset.theme);
+            cambiarTema(temas[Math.floor(Math.random() * temas.length)]);
+        }
+
+        function aplicarTemaGuardado() {
+            const perfil = JSON.parse(localStorage.getItem('liga_bs_usuario_activo'));
+            const temaGuardado = perfil?.theme
+                || (perfil && perfil.email ? localStorage.getItem(`liga_bs_tema_usuario:${perfil.email}`) : null)
+                || localStorage.getItem('liga_bs_tema');
+            const tema = esTemaCyberWin(temaGuardado) ? temaGuardado : 'red';
+            if (window.cyberWinAuth) window.cyberWinAuth.applyTheme(tema, perfil?.accentColor || '#dc2626');
+            else document.body.dataset.theme = tema;
+            document.getElementById('selector-tema-usuario').value = tema;
+        }
+
+        function actualizarDatosCompartidos(evento) {
+            if (evento.key === 'liga_bs_avisos' || evento.key === null) renderizarAvisosPublicos();
+            if (evento.key === 'liga_bs_afiliados_tiktok' || evento.key === null) renderizerListaAfiliadosTikTok();
+            if (evento.key === 'liga_bs_publicidad' || evento.key === null) inicializarConfiguracionesGlobales();
+            if ((evento.key === 'liga_bs_eventos' || evento.key === null) && !document.getElementById('vista-inicio').classList.contains('hidden')) renderizarEventosPublicos();
+            if (evento.key === 'liga_bs_tema' || (evento.key && evento.key.indexOf('liga_bs_tema_usuario:') === 0)) aplicarTemaGuardado();
+        }
+
+        async function inicializarConfiguracionesGlobales() {
+            try {
+                const response = await fetch('/api/public/state');
+                if (!response.ok) throw new Error(`No se pudo cargar la configuración (${response.status}).`);
+                const state = await response.json();
+                configuracionPublica = state.publicSettings || {};
+                localStorage.setItem('liga_bs_eventos', JSON.stringify(state.events || []));
+                localStorage.setItem('liga_bs_publicidad', configuracionPublica.advertisement || '');
+                localStorage.setItem('liga_bs_discord_aprobado', configuracionPublica.discord || '');
+            } catch (error) {
+                console.error('No se pudo cargar el estado público:', error);
+            }
+            const publicidad = configuracionPublica.advertisement || localStorage.getItem('liga_bs_publicidad') || "";
+            if (publicidad.trim() !== "") {
+                document.getElementById('barra-publicidad-global').classList.remove('hidden');
+                document.getElementById('texto-publicidad-dinamico').innerText = publicidad;
+            }
+            const urlDiscord = configuracionPublica.discord || localStorage.getItem('liga_bs_discord_aprobado') || "https://discord.gg/";
+            document.getElementById('enlace-discord-dinamico').href = urlDiscord;
+            renderizarAvisosPublicos();
+        }
+
+        async function renderizarAvisosPublicos() {
+            const contenedor = document.getElementById('contenedor-avisos-publicos');
+            let avisos = JSON.parse(localStorage.getItem('liga_bs_avisos')) || [];
+            let errorServidor = '';
+            if (window.location.protocol === 'file:') {
+                errorServidor = 'Abre Cyber Win desde http://localhost:3000/ para conectar con el servidor.';
+            } else {
+                try {
+                    const response = await fetch('/api/announcements');
+                    if (!response.ok) throw new Error(`No se pudieron cargar los avisos (${response.status}).`);
+                    const data = await response.json();
+                    avisos = data.announcements.map(aviso => ({
+                        titulo: aviso.title,
+                        mensaje: aviso.message,
+                        fecha: new Date(aviso.created_at).toLocaleString(),
+                        activo: true
+                    }));
+                    localStorage.setItem('liga_bs_avisos', JSON.stringify(avisos));
+                } catch (error) {
+                    console.error('Error cargando avisos del servidor:', error);
+                    contenedor.dataset.loadError = 'No se pudo conectar con el servidor de avisos.';
+                    errorServidor = 'No se pudo actualizar desde el servidor; se muestran avisos locales guardados en este navegador.';
+                }
+            }
+            const activos = avisos.filter(aviso => aviso.activo !== false);
+            contenedor.innerHTML = `${errorServidor ? `<p class="md:col-span-2 text-[10px] text-amber-400">${sanitizarHTML(errorServidor)}</p>` : ''}${activos.length ? '' : '<p class="text-xs text-stone-500 italic">No hay avisos publicados por el momento.</p>'}`;
+            activos.forEach(aviso => {
+                const tarjeta = document.createElement('article');
+                tarjeta.className = 'bg-black/50 border-l-2 border-amber-500 p-3 rounded';
+                tarjeta.innerHTML = `<h5 class="font-bold text-white text-sm">${sanitizarHTML(aviso.titulo)}</h5><p class="text-xs text-stone-300 mt-1 whitespace-pre-line">${sanitizarHTML(aviso.mensaje)}</p><time class="text-[9px] text-stone-500 mt-2 block">${sanitizarHTML(aviso.fecha || '')}</time>`;
+                contenedor.appendChild(tarjeta);
+            });
+        }
+
+        // CONTROL DE ACCESO INTERNO OBLIGATORIO
+        function comprobarSesionUsuario() {
+            const authState = window.cyberWinAuthState;
+            const perfil = authState?.ready && authState.user ? authState.profile : null;
+            const containerNav = document.getElementById('status-usuario-nav');
+            const vistaLogin = document.getElementById('vista-login');
+            const vistaInicio = document.getElementById('vista-inicio');
+            const abrirDashboard = vistaInicio.classList.contains('hidden');
+            const btnPropuesta = document.getElementById('btn-propone-torneo');
+
+            if (perfil && perfil.nickname && perfil.tag) {
+                // SESIÓN ACTIVA: Desbloquear ecosistema
+                document.getElementById('user-nav-name').textContent = perfil.nickname;
+                const navAvatar = document.getElementById('user-nav-avatar');
+                const navAvatarFallback = document.getElementById('user-nav-avatar-fallback');
+                document.getElementById('user-stream-nav').classList.toggle('hidden', perfil.isCreator !== true);
+                navAvatar.classList.toggle('hidden', !perfil.avatar);
+                navAvatarFallback.classList.toggle('hidden', Boolean(perfil.avatar));
+                if (perfil.avatar) navAvatar.src = perfil.avatar;
+                mostrarVistaPreviaPerfil(perfil);
+                containerNav.innerHTML = `
+                    <div class="text-right">
+                        <span class="font-bold text-white block">👋 ${sanitizarHTML(perfil.nickname)}</span>
+                        <span class="text-amber-400 font-mono text-[10px] tracking-wide block">${sanitizarHTML(perfil.tag)}</span>
+                        <span class="text-stone-500 font-mono text-[9px] block">${sanitizarHTML(perfil.email || '')}</span>
+                    </div>
+                    <button onclick="cerrarSesionUsuario()" class="bg-stone-900 border border-stone-800 text-[10px] text-stone-400 px-2 py-1 rounded hover:bg-red-950 hover:text-red-400">Salir</button>
+                `;
+                vistaLogin.classList.add('hidden');
+                vistaInicio.classList.remove('hidden');
+                btnPropuesta.classList.remove('hidden');
+                if (abrirDashboard) irASeccionUsuario('seccion-eventos');
+
+                // Renderizar los datos ya autorizados
+                renderizarEventosPublicos();
+                renderizerListaAfiliadosTikTok();
+                renderizarAvisosPublicos();
+                aplicarTemaGuardado();
+            } else {
+                // MODO SEGURO: Bloquear vistas y forzar inicio de sesión
+                selectedFriendId = null;
+                document.getElementById('user-stream-nav').classList.add('hidden');
+                document.getElementById('chat-input').disabled = true;
+                document.getElementById('chat-send').disabled = true;
+                containerNav.innerHTML = `<span class="text-stone-500 italic">${authState?.ready ? 'Inicia sesión' : 'Conectando…'}</span>`;
+                vistaInicio.classList.add('hidden');
+                document.getElementById('vista-evento-detalle').classList.add('hidden');
+                document.getElementById('vista-formulario-inscripcion').classList.add('hidden');
+                document.getElementById('vista-exito-inscripcion').classList.add('hidden');
+                
+                vistaLogin.classList.remove('hidden');
+                btnPropuesta.classList.add('hidden');
+            }
+        }
+
+        function cerrarSesionUsuario() {
+            if (confirm("¿Cerrar sesión actual en este navegador?")) window.cyberWinAuth?.signOut();
+        }
+
+        async function renderizarEventosPublicos() {
+            let errorServidor = '';
+            try {
+                const response = await fetch('/api/public/state');
+                if (!response.ok) throw new Error(`No se pudieron cargar los torneos (${response.status}).`);
+                const state = await response.json();
+                datosEventos = state.events || [];
+                localStorage.setItem('liga_bs_eventos', JSON.stringify(datosEventos));
+            } catch (error) {
+                console.error('No se pudieron actualizar los torneos:', error);
+                errorServidor = 'No se pudo conectar con el servidor de torneos. Se muestran los datos guardados en este navegador.';
+                datosEventos = JSON.parse(localStorage.getItem('liga_bs_eventos')) || [];
+            }
+            const contenedor = document.getElementById('contenedor-eventos-publicos');
+            contenedor.innerHTML = "";
+            if (errorServidor) {
+                const aviso = document.createElement('p');
+                aviso.className = 'col-span-full text-[10px] text-amber-400';
+                aviso.textContent = errorServidor;
+                contenedor.appendChild(aviso);
+            }
+
+            if (datosEventos.length === 0) {
+                contenedor.innerHTML = `
+                    <div class="col-span-full bg-stone-900/40 p-8 rounded-lg border border-stone-900/60 text-center space-y-2">
+                        <span class="text-2xl">💤</span>
+                        <h4 class="font-oriental text-stone-400 text-xs tracking-wider">SIN TORNEOS REGISTRADOS</h4>
+                        <p class="text-[11px] text-stone-600">No hay copas locales dadas de alta por la administración todavía.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            datosEventos.forEach(ev => {
+                const card = document.createElement('div');
+                card.className = "event-card bg-stone-900/90 rounded-lg border border-stone-850 overflow-hidden shadow-md flex flex-col justify-between hover:border-red-600/40 hover:-translate-y-0.5 transform duration-200";
+                let layoutBanner = ev.banner ? `<div class="h-28 overflow-hidden border-b border-stone-950"><img src="${ev.banner}" class="w-full h-full object-cover opacity-60"></div>` : `<div class="h-3 bg-red-950"></div>`;
+                const nInscritos = ev.equipos ? ev.equipos.length : 0;
+
+                card.innerHTML = `
+                    <div>
+                        ${layoutBanner}
+                        <div class="p-4 space-y-3 text-xs">
+                            <div>
+                                <span class="bg-black text-[9px] px-2 py-0.5 rounded text-amber-500 font-mono font-bold uppercase tracking-wider">${sanitizarHTML(ev.tipo)}</span>
+                                <h4 class="text-base font-bold text-white font-oriental tracking-wide mt-1.5 truncate">${sanitizarHTML(ev.nombre)}</h4>
+                            </div>
+                            <div class="grid grid-cols-2 gap-y-1.5 text-[11px] text-stone-400 font-mono border-t border-stone-950 pt-2.5">
+                                <div>📅 FECHA: <span class="text-stone-200">${sanitizarHTML(ev.fecha)}</span></div>
+                                <div>⏰ HORA: <span class="text-stone-200">${sanitizarHTML(ev.hora)}</span></div>
+                                <div>👥 CUPO: <span class="text-white font-bold">${nInscritos} / ${ev.limite}</span></div>
+                                <div>⚖️ ESTADO: <span class="text-amber-400 font-bold text-[9px]">${sanitizarHTML(ev.estado)}</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 pt-0">
+                        <button onclick="accederAEvento(${ev.id})" class="w-full bg-stone-800 hover:bg-red-600 text-white font-bold py-2 rounded text-xs uppercase tracking-wider shadow active:scale-[0.97]">Ingresar al Evento</button>
+                    </div>
+                `;
+                contenedor.appendChild(card);
+            });
+        }
+
+        function accederAEvento(id) {
+            eventoActivoId = id;
+            datosEventos = JSON.parse(localStorage.getItem('liga_bs_eventos')) || [];
+            const ev = datosEventos.find(e => e.id === id);
+            if (!ev) return;
+
+            document.getElementById('vista-inicio').classList.add('hidden');
+            document.getElementById('vista-evento-detalle').classList.remove('hidden');
+
+            let bannerHTML = ev.banner ? `<div class="absolute inset-0 z-0 opacity-10"><img src="${ev.banner}" class="w-full h-full object-cover filter blur-sm"></div>` : '';
+
+            document.getElementById('hero-torneo-detalle').innerHTML = `
+                ${bannerHTML}
+                <div class="relative z-10 space-y-2">
+                    <span class="text-[10px] font-mono text-amber-500 uppercase font-bold bg-black/40 px-2 py-0.5 rounded">${sanitizarHTML(ev.tipo)}</span>
+                    <h2 class="text-2xl font-bold font-oriental text-white tracking-wide">${sanitizarHTML(ev.nombre)}</h2>
+                    <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-stone-400 font-mono pt-1">
+                        <div>📅 Inicio: <span class="text-stone-200">${sanitizarHTML(ev.fecha)} - ${sanitizarHTML(ev.hora)}</span></div>
+                        <div>👑 Árbitro: <span class="text-stone-200 font-bold">${sanitizarHTML(ev.contacto)}</span></div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('label-premios-detalle').innerText = ev.premios;
+            document.getElementById('label-reglas-detalle').innerText = ev.reglas;
+
+            const nInscritos = ev.equipos ? ev.equipos.length : 0;
+            document.getElementById('contador-inscritos-label').innerText = `ESCUADRAS REGISTRADAS: ${nInscritos} / ${ev.limite}`;
+
+            const btnInscr = document.getElementById('btn-activar-formulario-inscripcion');
+            if (ev.estado !== 'INSCRIPCIONES ABIERTAS' || nInscritos >= ev.limite) {
+                btnInscr.classList.add('hidden');
+            } else {
+                btnInscr.classList.remove('hidden');
+            }
+
+            cambiarTabEvento('roster');
+        }
+
+        function cambiarTabEvento(tab) {
+            const tRoster = document.getElementById('tab-roster');
+            const tReglas = document.getElementById('tab-reglas');
+            const vRoster = document.getElementById('subvista-tab-roster');
+            const vReglas = document.getElementById('subvista-tab-reglas');
+
+            if (tab === 'roster') {
+                tRoster.className = "tab-btn py-2.5 px-4 border-b-2 border-red-600 text-white bg-stone-900/20";
+                tReglas.className = "tab-btn py-2.5 px-4 text-stone-400 hover:text-stone-200";
+                vRoster.classList.remove('hidden');
+                vReglas.classList.add('hidden');
+                renderizarLogisticaEspecifica();
+            } else {
+                tReglas.className = "tab-btn py-2.5 px-4 border-b-2 border-red-600 text-white bg-stone-900/20";
+                tRoster.className = "tab-btn py-2.5 px-4 text-stone-400 hover:text-stone-200";
+                vReglas.classList.remove('hidden');
+                vRoster.classList.add('hidden');
+            }
+        }
+
+        function renderizarLogisticaEspecifica() {
+            datosEventos = JSON.parse(localStorage.getItem('liga_bs_eventos')) || [];
+            const ev = datosEventos.find(e => e.id === eventoActivoId);
+            if (!ev) return;
+
+            const contenedor = document.getElementById('contenedor-logistica-especifica');
+            contenedor.innerHTML = "";
+
+            if (/copa|bracket|eliminaci[oó]n|showdown/i.test(ev.tipo || '')) {
+                const bracket = ev.bracketRondas || {};
+                const llaves = Object.keys(bracket);
+                let hayLíneas = false;
+
+                const wrapperBrackets = document.createElement('div');
+                wrapperBrackets.className = "space-y-4 text-xs animate-fade-up";
+
+                llaves.forEach(r => {
+                    const matches = bracket[r] || [];
+                    if (matches.length === 0) return;
+                    hayLíneas = true;
+
+                    const divRonda = document.createElement('div');
+                    divRonda.className = "bg-stone-900/40 p-3 rounded border border-stone-900 space-y-2";
+                    divRonda.innerHTML = `<h5 class="font-bold text-red-400 font-oriental tracking-wider text-[11px] border-b border-stone-950 pb-1">🔥 LLAVES: ${r}</h5>`;
+                    
+                    const grid = document.createElement('div');
+                    grid.className = "grid sm:grid-cols-2 gap-3 text-[11px]";
+
+                    matches.forEach((p) => {
+                        const cardMatch = document.createElement('div');
+                        cardMatch.className = "bg-black/60 p-2.5 rounded border border-stone-850 flex flex-col justify-center space-y-1";
+                        const eq1 = p.equipo1 ? p.equipo1 : 'Por definir';
+                        const eq2 = p.equipo2 ? p.equipo2 : 'Por definir';
+
+                        cardMatch.innerHTML = `
+                            <div class="flex justify-between items-center p-1.5 rounded ${p.ganador === p.equipo1 && p.equipo1 ? 'bg-emerald-950/30 text-emerald-400 font-bold border border-emerald-900/40' : 'bg-stone-900/60 text-stone-300'}">
+                                <span class="truncate">🛡️ ${sanitizarHTML(eq1)}</span>
+                            </div>
+                            <div class="text-center text-[9px] font-bold text-stone-600 font-mono">VS</div>
+                            <div class="flex justify-between items-center p-1.5 rounded ${p.ganador === p.equipo2 && p.equipo2 ? 'bg-indigo-950/30 text-indigo-400 font-bold border border-indigo-900/40' : 'bg-stone-900/60 text-stone-300'}">
+                                <span class="truncate">🛡️ ${sanitizarHTML(eq2)}</span>
+                            </div>
+                        `;
+                        grid.appendChild(cardMatch);
+                    });
+                    divRonda.appendChild(grid);
+                    wrapperBrackets.appendChild(divRonda);
+                });
+
+                if (!hayLíneas) {
+                    wrapperBrackets.innerHTML = `<p class="text-stone-500 italic text-center py-4">El bracket aleatorio se generará cuando el evento comience.</p>`;
+                }
+                contenedor.appendChild(wrapperBrackets);
+            } else {
+                const tabla = document.createElement('div');
+                tabla.className = "bg-stone-900/90 rounded-lg border border-stone-850 overflow-x-auto text-xs shadow-md animate-fade-up";
+                let cuerpoTabla = '';
+                const listaClanes = ev.equipos || [];
+
+                if (listaClanes.length === 0) {
+                    cuerpoTabla = `<tr><td colspan="3" class="p-6 text-center text-stone-500 italic">No hay clanes inscritos en este evento todavía.</td></tr>`;
+                } else {
+                    const ordenSorteo = ev.ordenSorteo || [];
+                    const ordenados = [...listaClanes].sort((a, b) => {
+                        const pointsDifference = (b.puntos || 0) - (a.puntos || 0);
+                        if (pointsDifference || !ordenSorteo.length) return pointsDifference;
+                        const position = name => {
+                            const index = ordenSorteo.indexOf(name);
+                            return index < 0 ? Number.MAX_SAFE_INTEGER : index;
+                        };
+                        return position(a.nombre) - position(b.nombre);
+                    });
+                    ordenados.forEach((eq, index) => {
+                        let divLogo = eq.logo ? `<img src="${eq.logo}" class="h-5 w-5 object-cover rounded border border-stone-700 shadow-inner">` : `<span>🛡️</span>`;
+                        cuerpoTabla += `
+                            <tr class="hover:bg-black/20 border-b border-stone-950 transition duration-150">
+                                <td class="p-3 font-mono font-bold text-stone-400 text-center w-12">#${index+1}</td>
+                                <td class="p-3">
+                                    <div class="flex items-center gap-2">
+                                        ${divLogo}
+                                        <div>
+                                            <span class="font-bold text-white block text-sm">${sanitizarHTML(eq.nombre)}</span>
+                                            <span class="text-[9px] text-stone-400 font-mono">Líder: ${sanitizarHTML(eq.j1)}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="p-3 text-right font-mono text-base font-bold text-amber-400 pr-6">${eq.puntos || 0} <span class="text-[10px] text-stone-500 font-normal">PTS</span></td>
+                            </tr>
+                        `;
+                    });
+                }
+
+                tabla.innerHTML = `
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-black text-[10px] text-stone-400 font-bold uppercase tracking-wider font-mono">
+                            <tr>
+                                <th class="p-3 text-center">POS</th>
+                                <th class="p-3">ESCUADRA COMPETING</th>
+                                <th class="p-3 text-right pr-6">PUNTUACIÓN</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-stone-950 bg-stone-900/30">${cuerpoTabla}</tbody>
+                    </table>
+                `;
+                contenedor.appendChild(tabla);
+            }
+        }
+
+        function mostrarFormularioInscripcion() {
+            const perfil = JSON.parse(localStorage.getItem('liga_bs_usuario_activo'));
+            if (!perfil) { comprobarSesionUsuario(); return; }
+
+            document.getElementById('vista-evento-detalle').classList.add('hidden');
+            document.getElementById('vista-formulario-inscripcion').classList.remove('hidden');
+
+            document.getElementById('club-j1').value = perfil.nickname;
+            document.getElementById('club-id1').value = perfil.tag;
+        }
+
+        function cancelarInscripcion() {
+            document.getElementById('form-inscripcion').reset();
+            document.getElementById('vista-formulario-inscripcion').classList.add('hidden');
+            document.getElementById('vista-evento-detalle').classList.remove('hidden');
+        }
+
+        async function procesarInscripciónClub(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-enviar-inscripcion');
+            btn.disabled = true;
+
+            datosEventos = JSON.parse(localStorage.getItem('liga_bs_eventos')) || [];
+            const ev = datosEventos.find(e => e.id === eventoActivoId);
+            if (!ev) { btn.disabled = false; return; }
+
+            const listaEquipos = ev.equipos || [];
+            const nombreClub = document.getElementById('club-nombre').value.trim();
+            const archivoLogo = document.getElementById('club-logo-file').files[0];
+            const supercellRegex = /^#[0-9A-Z]{3,10}$/;
+
+            const j1 = document.getElementById('club-j1').value.trim();
+            const id1 = document.getElementById('club-id1').value.trim();
+            
+            const j2 = document.getElementById('club-j2').value.trim();
+            let id2 = document.getElementById('club-id2').value.trim().toUpperCase();
+            if(!id2.startsWith('#')) id2 = '#' + id2;
+
+            const j3 = document.getElementById('club-j3').value.trim();
+            let id3 = document.getElementById('club-id3').value.trim().toUpperCase();
+            if(!id3.startsWith('#')) id3 = '#' + id3;
+
+            const j4 = document.getElementById('club-j4').value.trim();
+            let id4 = document.getElementById('club-id4').value.trim().toUpperCase();
+            if(id4 && !id4.startsWith('#')) id4 = '#' + id4;
+
+            if (!supercellRegex.test(id1) || !supercellRegex.test(id2) || !supercellRegex.test(id3) || (id4 && !supercellRegex.test(id4))) {
+                alert("🚨 Uno o más Player Tags de la alineación no cumplen con el formato oficial.");
+                btn.disabled = false;
+                return;
+            }
+            if (Boolean(j4) !== Boolean(id4)) {
+                alert("🚨 Si agregas un suplente, completa también su Player Tag; si no, deja ambos campos vacíos.");
+                btn.disabled = false;
+                return;
+            }
+
+            if (listaEquipos.some(x => x.nombre.toLowerCase() === nombreClub.toLowerCase())) {
+                alert("❌ Ese nombre de club ya está en uso.");
+                btn.disabled = false;
+                return;
+            }
+
+            if (archivoLogo && archivoLogo.size > 300 * 1024) {
+                alert("❌ El escudo supera el límite de 300 KB.");
+                btn.disabled = false;
+                return;
+            }
+            if (archivoLogo && !['image/png', 'image/jpeg', 'image/webp'].includes(archivoLogo.type)) {
+                alert("❌ El escudo debe ser PNG, JPEG o WebP.");
+                btn.disabled = false;
+                return;
+            }
+
+            const lector = new FileReader();
+            lector.onload = async function() {
+                let logoBase64 = lector.result || "";
+                try {
+                    const jugadores = [
+                        { nickname: j1, tag: id1 },
+                        { nickname: j2, tag: id2 },
+                        { nickname: j3, tag: id3 },
+                        ...(j4 ? [{ nickname: j4, tag: id4 }] : [])
+                    ];
+                    const result = await window.cyberWinAuth.request(`/api/public/events/${encodeURIComponent(ev.id)}/registrations`, {
+                        method: 'POST',
+                        body: JSON.stringify({ nombre: nombreClub, logo: logoBase64, jugadores })
+                    });
+                    datosEventos = datosEventos.map(event => event.id === result.event.id ? result.event : event);
+                    localStorage.setItem('liga_bs_eventos', JSON.stringify(datosEventos));
+                    document.getElementById('ticket-club').innerText = nombreClub.toUpperCase();
+                    if (logoBase64.startsWith('data:image/')) {
+                        document.getElementById('ticket-logo').src = logoBase64;
+                    }
+                    document.getElementById('form-inscripcion').reset();
+                    document.getElementById('vista-formulario-inscripcion').classList.add('hidden');
+                    document.getElementById('vista-exito-inscripcion').classList.remove('hidden');
+                } catch (error) {
+                    alert(`❌ No se pudo completar la inscripción: ${error.message}`);
+                } finally {
+                    btn.disabled = false;
+                }
+            };
+            lector.onerror = function() {
+                alert("❌ No se pudo leer el archivo del escudo. Intenta con otra imagen.");
+                btn.disabled = false;
+            };
+
+            if (archivoLogo) { lector.readAsDataURL(archivoLogo); } else { lector.onload(); }
+        }
+
+        function finalizarYVerTabla() {
+            document.getElementById('vista-exito-inscripcion').classList.add('hidden');
+            accederAEvento(eventoActivoId);
+        }
+
+        function volverAlInicio() {
+            eventoActivoId = null;
+            document.getElementById('vista-evento-detalle').classList.add('hidden');
+            document.getElementById('vista-formulario-inscripcion').classList.add('hidden');
+            document.getElementById('vista-exito-inscripcion').classList.add('hidden');
+            comprobarSesionUsuario();
+        }
+
+        // PROPUESTAS
+        function abrirModalPropuesta() { document.getElementById('modal-propuesta').classList.remove('hidden'); }
+        function cerrarModalPropuesta() { document.getElementById('modal-propuesta').classList.add('hidden'); }
+
+        async function registrarPropuestaTorneo(e) {
+            e.preventDefault();
+            const perfil = JSON.parse(localStorage.getItem('liga_bs_usuario_activo'));
+            if(!perfil) return;
+
+            const nuevaPropuesta = {
+                nombre: document.getElementById('prop-nombre').value.trim(),
+                tipo: document.getElementById('prop-tipo').value,
+                detalles: document.getElementById('prop-detalles').value.trim(),
+                organizador: perfil.nickname, contacto: perfil.tag
+            };
+            try {
+                await window.cyberWinAuth.request('/api/public/state/proposals', {
+                    method: 'POST',
+                    body: JSON.stringify(nuevaPropuesta)
+                });
+                alert("💡 ¡Propuesta enviada para evaluación de los administradores!");
+                e.target.reset();
+                cerrarModalPropuesta();
+            } catch (error) {
+                alert(`❌ No se pudo enviar la propuesta: ${error.message}`);
+            }
+        }
+
+        // BUGS
+        function abrirModalBug() { document.getElementById('modal-bug').classList.remove('hidden'); }
+        function cerrarModalBug() { document.getElementById('modal-bug').classList.add('hidden'); }
+
+        async function registrarBugComunidad(e) {
+            e.preventDefault();
+            const perfil = JSON.parse(localStorage.getItem('liga_bs_usuario_activo')) || { nickname: 'Anónimo' };
+            const nuevoBug = {
+                idBug: 'TK-' + Math.floor(1000 + Math.random() * 9000),
+                origen: document.getElementById('bug-origen').value,
+                descripcion: document.getElementById('bug-desc').value.trim(),
+                contacto: document.getElementById('bug-contacto').value.trim(),
+                reportadoPor: perfil.nickname,
+                fechaHora: new Date().toLocaleString()
+            };
+            try {
+                await window.cyberWinAuth.request('/api/public/state/bugs', {
+                    method: 'POST',
+                    body: JSON.stringify(nuevoBug)
+                });
+                alert(`🚨 Ticket de soporte enviado. ID: ${nuevoBug.idBug}`);
+                e.target.reset();
+                cerrarModalBug();
+            } catch (error) {
+                alert(`❌ No se pudo enviar el reporte: ${error.message}`);
+            }
+        }
+
+        // CREADORES
+        async function postularComoCreador() {
+            const authState = window.cyberWinAuthState;
+            const perfil = authState?.profile;
+            if (!authState?.user || !perfil?.nickname) {
+                alert('Inicia sesión y completa tu perfil antes de postularte.');
+                return;
+            }
+
+            const userTk = prompt('Introduce tu usuario de creador (sin @):');
+            if (!userTk || userTk.trim() === "") return;
+
+            try {
+                await window.cyberWinAuth.request('/api/creator-applications', {
+                    method: 'POST',
+                    body: JSON.stringify({ handle: userTk.trim() })
+                });
+                alert('📥 Postulación enviada al panel administrativo. Te avisaremos cuando sea revisada.');
+            } catch (error) {
+                alert(`❌ No se pudo enviar la solicitud: ${error.message}`);
+            }
+        }
+
+        async function renderizerListaAfiliadosTikTok() {
+            let lista = JSON.parse(localStorage.getItem('liga_bs_afiliados_tiktok')) || [];
+            const contenedor = document.getElementById('lista-creadores-publica');
+            let errorServidor = '';
+            if (window.location.protocol === 'file:') {
+                errorServidor = 'Abre Cyber Win desde http://localhost:3000/ para cargar el catálogo oficial.';
+            } else {
+                try {
+                    const response = await fetch('/api/creators');
+                    if (!response.ok) throw new Error(`No se pudieron cargar los creadores (${response.status}).`);
+                    const data = await response.json();
+                    const creadoresSql = data.creators.map(creador => ({
+                        id: creador.id,
+                        usuario: creador.handle,
+                        nombre: creador.display_name,
+                        rango: creador.category,
+                        estado: 'APROBADO',
+                        profileUrl: creador.profile_url,
+                        liveUrl: creador.live_url,
+                        isLive: creador.is_live
+                    }));
+                    if (creadoresSql.length) {
+                        lista = creadoresSql;
+                        localStorage.setItem('liga_bs_afiliados_tiktok', JSON.stringify(lista));
+                    } else {
+                        lista = lista.filter(creador => creador.estado === 'APROBADO');
+                    }
+                } catch (error) {
+                    console.error('Error cargando creadores del servidor:', error);
+                    errorServidor = 'Catálogo sin actualizar: no se pudo contactar con el servidor.';
+                }
+            }
+            contenedor.innerHTML = "";
+            const aprobados = lista.filter(x => x.estado === 'APROBADO')
+                .sort((a, b) => Number(Boolean(b.isLive)) - Number(Boolean(a.isLive)));
+            if (errorServidor) {
+                const aviso = document.createElement('p');
+                aviso.className = 'col-span-full text-[9px] text-amber-400';
+                aviso.textContent = errorServidor;
+                contenedor.appendChild(aviso);
+            }
+
+            if (aprobados.length === 0) {
+                contenedor.innerHTML = `<div class="col-span-full text-stone-600 italic py-1 text-center">No hay creadores oficiales vinculados.</div>`;
+                return;
+            }
+
+            aprobados.forEach(af => {
+                const item = document.createElement('div');
+                item.className = `bg-black/40 p-3 rounded-lg border ${af.isLive ? 'border-red-700/70 shadow-lg shadow-red-950/30' : 'border-stone-900'} flex flex-col hover:border-red-600/50 hover:bg-black/70 transition truncate`;
+                const perfilCreador = document.createElement('a');
+                perfilCreador.href = af.profileUrl || `https://www.tiktok.com/@${encodeURIComponent(af.usuario)}`;
+                perfilCreador.target = "_blank";
+                perfilCreador.rel = "noopener noreferrer";
+                perfilCreador.className = 'font-bold text-stone-200 block truncate';
+                perfilCreador.textContent = `🎵 ${af.nombre || '@' + af.usuario}`;
+                const rango = document.createElement('span');
+                rango.className = 'text-[9px] text-amber-500 font-mono uppercase block tracking-wider';
+                rango.textContent = af.rango;
+                item.append(perfilCreador, rango);
+                if (af.isLive && af.liveUrl) {
+                    const liveBadge = document.createElement('span');
+                    liveBadge.className = 'mt-2 self-start inline-flex items-center gap-1 rounded-full bg-red-950 text-red-300 px-2 py-1 text-[9px] font-bold tracking-wider';
+                    liveBadge.textContent = '🔴 EN VIVO';
+                    item.appendChild(liveBadge);
+                }
+                contenedor.appendChild(item);
+                if (af.liveUrl && /^https?:\/\//i.test(af.liveUrl)) {
+                    const live = document.createElement('a');
+                    live.href = af.liveUrl;
+                    live.target = '_blank';
+                    live.rel = 'noopener noreferrer';
+                    live.textContent = af.isLive ? 'Ver directo en vivo' : 'Abrir canal del creador';
+                    live.className = `text-[10px] underline mt-2 font-bold ${af.isLive ? 'text-red-300' : 'text-stone-400'}`;
+                    item.appendChild(live);
+                }
+            });
+        }
+    </script>
+    <script src="/firebase-config.js"></script>
+    <script type="module" src="/firebase-auth.js"></script>
+</body>
+</html>
